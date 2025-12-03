@@ -1,0 +1,23 @@
+server:
+  port: 19034
+
+spring:
+  application:
+    name: limited-product-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/limito-db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:19090/eureka
