@@ -1,13 +1,17 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:17
+    container_name: postgresql
+    restart: unless-stopped
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: limito-db
     ports:
-      - '5432'
+      - 5432:5432
+
   redis:
-    image: 'redis:latest'
+    image: redis/redis-stack:latest
+    container_name: redis
     ports:
-      - '6379'
+      - 6379:6379
