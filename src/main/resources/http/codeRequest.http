@@ -1,0 +1,11 @@
+### POST SELECT - 인당 최대 구매 가능 수량 조회
+POST http://localhost:19034/internal/v1/limited-products/purchase-amount-limit
+Content-Type: application/json
+
+{
+  "itemIdList": [
+    "40000000-0000-0000-0000-000000000001",
+    "40000000-0000-0000-0000-000000000002"
+  ]
+}
+
