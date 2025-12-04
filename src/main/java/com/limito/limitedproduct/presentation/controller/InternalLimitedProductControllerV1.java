@@ -10,6 +10,7 @@ import com.limito.limitedproduct.application.service.LimitedProductService;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,7 +22,7 @@ public class InternalLimitedProductControllerV1 {
 
 	@GetMapping("/purchase-amount-limit")
 	public ResponseEntity<?> getPurchaseAmountLimits(
-		@RequestBody GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
+		@Valid @RequestBody GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
 	) {
 		GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimitResponseV1
 			= limitedProductService.getPurchaseAmountLimits(getPurchaseAmountLimitRequestV1);
