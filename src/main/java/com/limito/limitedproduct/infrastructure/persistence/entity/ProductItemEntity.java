@@ -27,18 +27,18 @@ public class ProductItemEntity {
 	private String size;
 
 	@Column(name = "price", nullable = false)
-	@ColumnDefault("-1")
 	private int price;
 
 	@Column(name = "stock", nullable = false)
 	@ColumnDefault("0")
 	private int stock;
 
-	@Column(name = "soldout", nullable = false)
+	@Column(name = "sold_out", nullable = false)
 	@ColumnDefault("FALSE")
 	private boolean isSoldOut;
 
 	@Column(name = "purchase_amount_limit", nullable = false)
+	@ColumnDefault("2147483647")
 	private int purchaseAmountLimit;
 
 	@ManyToOne
