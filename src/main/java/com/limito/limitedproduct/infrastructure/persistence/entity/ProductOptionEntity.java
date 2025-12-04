@@ -26,7 +26,7 @@ public class ProductOptionEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "limited_product_option_id", nullable = false, updatable = false)
-	private UUID productOptionId;
+	private UUID id;
 
 	@Column(name = "model_number", nullable = false, unique = true, length = 50)
 	private String modelNo;

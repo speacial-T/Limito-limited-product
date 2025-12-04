@@ -20,7 +20,7 @@ public class ProductItemEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "limited_product_item_id", nullable = false, updatable = false)
-	private UUID productItemId;
+	private UUID id;
 
 	@Column(name = "size", nullable = false, length = 10)
 	@ColumnDefault("'one size'")

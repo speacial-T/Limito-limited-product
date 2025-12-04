@@ -16,7 +16,7 @@ public class ProductEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "limited_product_id", nullable = false, updatable = false)
-	private UUID productId;
+	private UUID id;
 
 	@Column(name = "category_id", nullable = false)
 	private UUID categoryId;
