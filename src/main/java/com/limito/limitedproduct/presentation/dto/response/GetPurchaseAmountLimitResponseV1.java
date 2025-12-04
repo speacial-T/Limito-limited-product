@@ -3,6 +3,8 @@ package com.limito.limitedproduct.presentation.dto.response;
 import java.util.List;
 import java.util.UUID;
 
+import com.limito.limitedproduct.domain.vo.ProductItem;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 
@@ -10,8 +12,7 @@ import lombok.Builder;
 public class GetPurchaseAmountLimitResponseV1 {
 	private List<PurchaseAmountLimit> items;
 
-	public static GetPurchaseAmountLimitResponseV1 of(List<UUID> list) {
-		//TODO(은선):임시로 List<UUID> 형태의 목록을 받음
+	public static GetPurchaseAmountLimitResponseV1 of(List<ProductItem> list) {
 		return GetPurchaseAmountLimitResponseV1.builder()
 			.items(list.stream().map(PurchaseAmountLimit::from).toList())
 			.build();
@@ -22,11 +23,11 @@ public class GetPurchaseAmountLimitResponseV1 {
 		private UUID limitedProductItemId;
 		private int purchaseAmountLimit;
 
-		private static PurchaseAmountLimit from(UUID uuid) {
+		private static PurchaseAmountLimit from(ProductItem productItem) {
 			//TODO(은선):임시 데이터
 			return PurchaseAmountLimit.builder()
-				.limitedProductItemId(UUID.randomUUID())
-				.purchaseAmountLimit(1)
+				.limitedProductItemId(productItem.getId())
+				.purchaseAmountLimit(builder().purchaseAmountLimit)
 				.build();
 		}
 	}
