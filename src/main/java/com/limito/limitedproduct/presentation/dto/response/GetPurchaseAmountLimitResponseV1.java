@@ -7,27 +7,29 @@ import com.limito.limitedproduct.domain.vo.ProductItem;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class GetPurchaseAmountLimitResponseV1 {
 	private List<PurchaseAmountLimit> items;
 
-	public static GetPurchaseAmountLimitResponseV1 of(List<ProductItem> list) {
+	public static GetPurchaseAmountLimitResponseV1 of(List<ProductItem> productItemList) {
 		return GetPurchaseAmountLimitResponseV1.builder()
-			.items(list.stream().map(PurchaseAmountLimit::from).toList())
+			.items(productItemList.stream().map(PurchaseAmountLimit::from).toList())
 			.build();
 	}
 
+	@Getter
 	@Builder(access = AccessLevel.PRIVATE)
-	private static class PurchaseAmountLimit {
+	public static class PurchaseAmountLimit {
 		private UUID limitedProductItemId;
 		private int purchaseAmountLimit;
 
-		private static PurchaseAmountLimit from(ProductItem productItem) {
-			//TODO(은선):임시 데이터
+		public static PurchaseAmountLimit from(ProductItem productItem) {
 			return PurchaseAmountLimit.builder()
 				.limitedProductItemId(productItem.getId())
-				.purchaseAmountLimit(builder().purchaseAmountLimit)
+				.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
 				.build();
 		}
 	}
