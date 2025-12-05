@@ -22,11 +22,10 @@ public class InternalLimitedProductControllerV1 {
 
 	@PostMapping("/purchase-amount-limit")
 	public ResponseEntity<GetPurchaseAmountLimitResponseV1> getPurchaseAmountLimits(
-		@Valid @RequestBody GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
+		@Valid @RequestBody GetPurchaseAmountLimitRequestV1 request
 	) {
-		GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimitResponseV1
-			= limitedProductServiceV1.getPurchaseAmountLimits(getPurchaseAmountLimitRequestV1);
+		GetPurchaseAmountLimitResponseV1 response = limitedProductServiceV1.getPurchaseAmountLimits(request);
 
-		return ResponseEntity.ok(getPurchaseAmountLimitResponseV1);
+		return ResponseEntity.ok(response);
 	}
 }
