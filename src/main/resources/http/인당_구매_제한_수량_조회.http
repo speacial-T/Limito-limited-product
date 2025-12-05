@@ -1,0 +1,29 @@
+### POST SELECT - 인당 최대 구매 가능 수량 조회(성공)
+POST http://localhost:19034/internal/v1/limited-products/purchase-amount-limit
+Content-Type: application/json
+
+{
+  "itemIdList": [
+    "40000000-0000-0000-0000-000000000001",
+    "40000000-0000-0000-0000-000000000001",
+    "40000000-0000-0000-0000-000000000002"
+  ]
+}
+
+### POST SELECT - 인당 최대 구매 가능 수량 조회(실패 - 잘못된 UUID)
+POST http://localhost:19034/internal/v1/limited-products/purchase-amount-limit
+Content-Type: application/json
+
+{
+  "itemIdList": [
+    "40000000-0000-0000-1111-000000000001"
+  ]
+}
+
+### POST SELECT - 인당 최대 구매 가능 수량 조회(실패 - 빈 요청)
+POST http://localhost:19034/internal/v1/limited-products/purchase-amount-limit
+Content-Type: application/json
+
+{
+  "itemIdList": []
+}
