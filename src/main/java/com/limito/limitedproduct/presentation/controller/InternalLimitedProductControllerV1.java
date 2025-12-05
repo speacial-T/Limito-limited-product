@@ -21,7 +21,7 @@ public class InternalLimitedProductControllerV1 {
 	private final LimitedProductServiceV1 limitedProductServiceV1;
 
 	@PostMapping("/purchase-amount-limit")
-	public ResponseEntity<?> getPurchaseAmountLimits(
+	public ResponseEntity<GetPurchaseAmountLimitResponseV1> getPurchaseAmountLimits(
 		@Valid @RequestBody GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
 	) {
 		GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimitResponseV1
