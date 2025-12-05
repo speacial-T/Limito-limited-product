@@ -61,7 +61,7 @@ class LimitedProductServiceV1Test {
 
 	@Nested
 	@DisplayName("[성공] 인당 최대 구매 가능 수량 조회")
-	class LimtitedProductSuccessTest {
+	class LimitedProductSuccessTest {
 		@DisplayName("성공")
 		@Test
 		void getPurchaseAmountLimits_Success() {
@@ -74,7 +74,7 @@ class LimitedProductServiceV1Test {
 
 	@Nested
 	@DisplayName("[실패] 인당 최대 구매 가능 수량 조회")
-	class LimtitedProductFailTest {
+	class LimitedProductFailTest {
 		@DisplayName("실패 - 잘못된 uuid")
 		@Test
 		void getPurchaseAmountLimits_Fail_whenWrongUuid_thenThrowException() {
