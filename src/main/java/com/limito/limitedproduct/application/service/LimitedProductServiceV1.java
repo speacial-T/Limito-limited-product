@@ -20,10 +20,8 @@ public class LimitedProductServiceV1 {
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(
 		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
 	) {
-		List<ProductItem> productItemList = getPurchaseAmountLimitRequestV1.itemIdList()
-			.stream()
-			.map(limitedProductItemRepository::findById)
-			.toList();
+		List<ProductItem> productItemList
+			= limitedProductItemRepository.findAllById(getPurchaseAmountLimitRequestV1.itemIdList());
 
 		return GetPurchaseAmountLimitResponseV1.of(productItemList);
 	}

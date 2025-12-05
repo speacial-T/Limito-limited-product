@@ -1,5 +1,6 @@
 package com.limito.limitedproduct.infrastructure.persistence.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -20,15 +21,16 @@ public class LimitedProductItemRepositoryImpl implements LimitedProductItemRepos
 	private final LimitedProductItemJpaRepository limitedProductItemJpaRepository;
 
 	@Override
-	public ProductItem findById(UUID id) {
-		ProductItemEntity productItemEntity = limitedProductItemJpaRepository.findById(id)
-			.orElseThrow(() ->
-				AppException.of(
-					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
-					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage()
-				)
-			);
+	public List<ProductItem> findAllById(List<UUID> uuidList) {
+		List<ProductItemEntity> productItemEntityList = limitedProductItemJpaRepository.findAllById(uuidList);
 
-		return ProductMapper.toDomain(productItemEntity);
+		if (productItemEntityList.size() < uuidList.size()) {
+			throw AppException.of(
+				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
+				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage()
+			);
+		}
+
+		return productItemEntityList.stream().map(ProductMapper::toDomain).toList();
 	}
 }

@@ -35,10 +35,9 @@ class LimitedProductServiceV1Test {
 		// given
 		UUID itemId1 = UUID.fromString("40000000-0000-0000-0000-000000000001");
 		UUID itemId2 = UUID.fromString("40000000-0000-0000-0000-000000000002");
+		List<UUID> itemIdList = List.of(itemId1, itemId2);
 
-		GetPurchaseAmountLimitRequestV1 request = new GetPurchaseAmountLimitRequestV1(
-			List.of(itemId1, itemId2)
-		);
+		GetPurchaseAmountLimitRequestV1 request = new GetPurchaseAmountLimitRequestV1(itemIdList);
 
 		ProductItem productItem1 = ProductItem.builder()
 			.id(itemId1)
@@ -58,8 +57,9 @@ class LimitedProductServiceV1Test {
 			.purchaseAmountLimit(2)
 			.build();
 
-		when(limitedProductItemRepository.findById(itemId1)).thenReturn(productItem1);
-		when(limitedProductItemRepository.findById(itemId2)).thenReturn(productItem2);
+		List<ProductItem> itemList = List.of(productItem1, productItem2);
+
+		when(limitedProductItemRepository.findAllById(itemIdList)).thenReturn(itemList);
 
 		// when
 		GetPurchaseAmountLimitResponseV1 response = limitedProductServiceV1.getPurchaseAmountLimits(request);
@@ -77,8 +77,7 @@ class LimitedProductServiceV1Test {
 		assertThat(secondItem.getLimitedProductItemId()).isEqualTo(itemId2);
 		assertThat(secondItem.getPurchaseAmountLimit()).isEqualTo(2);
 
-		verify(limitedProductItemRepository, times(1)).findById(itemId1);
-		verify(limitedProductItemRepository, times(1)).findById(itemId2);
+		verify(limitedProductItemRepository, times(1)).findAllById(itemIdList);
 	}
 
 	@DisplayName("인당 구매 가능 수량 조회 - 실패(잘못된 uuid)")
@@ -86,12 +85,13 @@ class LimitedProductServiceV1Test {
 	void getPurchaseAmountLimits_Fail_whenWrongUuid_thenThrowException() {
 		// given
 		UUID wrongItemId1 = UUID.fromString("40000000-1111-0000-0000-000000000001");
+		List<UUID> itemIdList = List.of(wrongItemId1);
 
 		GetPurchaseAmountLimitRequestV1 requestWrongItemId1 = new GetPurchaseAmountLimitRequestV1(
 			List.of(wrongItemId1)
 		);
 
-		when(limitedProductItemRepository.findById(wrongItemId1))
+		when(limitedProductItemRepository.findAllById(itemIdList))
 			.thenThrow(
 				AppException.of(
 					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
@@ -104,6 +104,6 @@ class LimitedProductServiceV1Test {
 			.isInstanceOf(AppException.class)
 			.hasMessageContaining(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage());
 
-		verify(limitedProductItemRepository, times(1)).findById(wrongItemId1);
+		verify(limitedProductItemRepository, times(1)).findAllById(itemIdList);
 	}
 }
