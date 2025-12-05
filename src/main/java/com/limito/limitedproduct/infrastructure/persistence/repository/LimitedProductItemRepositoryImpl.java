@@ -22,13 +22,14 @@ public class LimitedProductItemRepositoryImpl implements LimitedProductItemRepos
 	public List<ProductItem> findAllById(List<UUID> uuidList) {
 		List<ProductItem> productItemList = limitedProductItemJpaRepository.findAllById(uuidList);
 
-		if (productItemList.size() < uuidList.size()) {
-			throw AppException.of(
-				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
-				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage()
-			);
-		}
+		validateFindAllById(uuidList, productItemList);
 
 		return productItemList;
+	}
+
+	private void validateFindAllById(List<?> request, List<?> response) {
+		if (request.size() != response.size()) {
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND);
+		}
 	}
 }
