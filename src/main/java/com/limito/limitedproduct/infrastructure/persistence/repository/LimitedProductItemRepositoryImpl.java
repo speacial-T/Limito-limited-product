@@ -27,7 +27,7 @@ public class LimitedProductItemRepositoryImpl implements LimitedProductItemRepos
 		return productItemList;
 	}
 
-	private void validateFindAllById(List<?> request, List<?> response) {
+	private void validateFindAllById(List<UUID> request, List<ProductItem> response) {
 		if (request.size() != response.size()) {
 			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND);
 		}
