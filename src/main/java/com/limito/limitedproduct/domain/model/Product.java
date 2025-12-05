@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.infrastructure.persistence.entity;
+package com.limito.limitedproduct.domain.model;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "p_limited_products")
-public class ProductEntity {
+public class Product {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)

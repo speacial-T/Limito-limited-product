@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.infrastructure.persistence.entity;
+package com.limito.limitedproduct.domain.model;
 
 import java.util.UUID;
 
@@ -12,12 +12,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_limited_product_items")
 @Getter
-public class ProductItemEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+public class ProductItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -45,5 +52,5 @@ public class ProductItemEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "limited_product_option_id", nullable = false, updatable = false)
-	private ProductOptionEntity productOption;
+	private ProductOption productOption;
 }

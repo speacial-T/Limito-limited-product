@@ -6,11 +6,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.LimitedProductItemRepository;
-import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
-import com.limito.limitedproduct.infrastructure.persistence.entity.ProductItemEntity;
-import com.limito.limitedproduct.infrastructure.persistence.mapper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,15 +20,16 @@ public class LimitedProductItemRepositoryImpl implements LimitedProductItemRepos
 
 	@Override
 	public List<ProductItem> findAllById(List<UUID> uuidList) {
-		List<ProductItemEntity> productItemEntityList = limitedProductItemJpaRepository.findAllById(uuidList);
+		List<ProductItem> productItemList = limitedProductItemJpaRepository.findAllById(uuidList);
 
-		if (productItemEntityList.size() < uuidList.size()) {
-			throw AppException.of(
-				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
-				LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage()
-			);
+		validateFindAllById(uuidList, productItemList);
+
+		return productItemList;
+	}
+
+	private void validateFindAllById(List<UUID> request, List<ProductItem> response) {
+		if (request.size() != response.size()) {
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND);
 		}
-
-		return productItemEntityList.stream().map(ProductMapper::toDomain).toList();
 	}
 }
