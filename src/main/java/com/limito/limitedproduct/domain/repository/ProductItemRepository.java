@@ -8,4 +8,6 @@ import com.limito.limitedproduct.domain.model.ProductItem;
 public interface ProductItemRepository {
 
 	List<ProductItem> findAllById(List<UUID> uuids);
+
+	void soldOut(UUID uuid);
 }

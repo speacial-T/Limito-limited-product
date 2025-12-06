@@ -17,8 +17,10 @@ import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProduct;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ItemAmount;
+import com.limito.limitedproduct.presentation.dto.request.StockItem;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class LimitedProductServiceV1 {
 	public void reserveStock(ReserveStockRequestV1 request) {
 		List<UUID> requestItemIdList = request.items()
 			.stream()
-			.map(ItemAmount::limitedProductItemId)
+			.map(StockItem::limitedProductItemId)
 			.toList();
 
 		validateDuplicateId(requestItemIdList);
@@ -59,17 +61,56 @@ public class LimitedProductServiceV1 {
 			.collect(Collectors.toMap(ProductItem::getId, Function.identity()));
 		validatePurchaseAmountLimit(productItemMap, request.items());
 
-		List<ItemAmount> reservedItem = new ArrayList<>();
+		List<StockItem> reservedItemList = new ArrayList<>();
 		try {
-			for (ItemAmount itemAmount : request.items()) {
-				productCacheRepository.reserve(itemAmount.limitedProductItemId(), itemAmount.amount());
-				reservedItem.add(itemAmount);
+			for (StockItem stockItem : request.items()) {
+				productCacheRepository.reserve(stockItem.limitedProductItemId(), stockItem.amount());
+				reservedItemList.add(stockItem);
 			}
 		} catch (Exception e) {
-			for (ItemAmount itemAmount : reservedItem) {
+			for (StockItem itemAmount : reservedItemList) {
 				productCacheRepository.cancelReservation(itemAmount.limitedProductItemId(), itemAmount.amount());
 			}
 			throw e;
+		}
+	}
+
+	public void reduceStock(ReduceStockRequestV1 request) {
+		List<UUID> requestOptionIdList = request.products()
+			.stream()
+			.map(ReduceStockProduct::limitedProductOptionId)
+			.toList();
+		validateDuplicateId(requestOptionIdList);
+
+		for (ReduceStockProduct product : request.products()) {
+			List<UUID> requestItemIdList = product.items()
+				.stream()
+				.map(StockItem::limitedProductItemId)
+				.toList();
+			validateDuplicateId(requestItemIdList);
+		}
+
+		List<StockItem> reducedItemList = new ArrayList<>();
+		try {
+			for (ReduceStockProduct reduceStockProduct : request.products()) {
+				for (StockItem stockItem : reduceStockProduct.items()) {
+					productCacheRepository.reduceStock(stockItem.limitedProductItemId(), stockItem.amount());
+					reducedItemList.add(stockItem);
+				}
+			}
+		} catch (Exception e) {
+			for (StockItem stockItem : reducedItemList) {
+				productCacheRepository.cancelReduction(stockItem.limitedProductItemId(), stockItem.amount());
+			}
+			throw e;
+		}
+
+		for (ReduceStockProduct reduceStockProduct : request.products()) {
+			for (StockItem stockItem : reduceStockProduct.items()) {
+				if (productCacheRepository.checkSoldOut(stockItem.limitedProductItemId())) {
+					productItemRepository.soldOut(stockItem.limitedProductItemId());
+				}
+			}
 		}
 	}
 
@@ -93,8 +134,8 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList, List<ItemAmount> itemAmountList) {
-		for (ItemAmount itemAmount : itemAmountList) {
+	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList, List<StockItem> itemAmountList) {
+		for (StockItem itemAmount : itemAmountList) {
 			ProductItem productItem = productItemList.get(itemAmount.limitedProductItemId());
 			productItem.validatePurchaseAmountLimit(itemAmount.amount());
 		}

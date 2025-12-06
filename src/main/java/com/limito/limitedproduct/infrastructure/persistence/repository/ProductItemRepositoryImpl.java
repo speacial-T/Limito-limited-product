@@ -27,6 +27,11 @@ public class ProductItemRepositoryImpl implements ProductItemRepository {
 		return productItemList;
 	}
 
+	@Override
+	public void soldOut(UUID uuid) {
+		productItemJpaRepository.updateSoldOutById(uuid);
+	}
+
 	private void validateFindAllById(List<UUID> request, List<ProductItem> response) {
 		if (request.size() != response.size()) {
 			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND);
