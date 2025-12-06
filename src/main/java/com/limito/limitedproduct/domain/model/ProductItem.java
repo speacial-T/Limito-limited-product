@@ -64,7 +64,7 @@ public class ProductItem {
 
 	public void validateProductItemIsNotSoldOut() {
 		if (isSoldOut) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_NOT_OPENED);
+			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_IS_SOLD_OUT);
 		}
 	}
 
