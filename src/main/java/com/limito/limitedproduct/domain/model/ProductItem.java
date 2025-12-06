@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -39,6 +40,7 @@ public class ProductItem {
 	@Column(name = "price", nullable = false)
 	private int price;
 
+	@Getter
 	@Column(name = "stock", nullable = false)
 	@ColumnDefault("0")
 	private int stock;

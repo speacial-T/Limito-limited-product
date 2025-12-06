@@ -81,6 +81,7 @@ public class LimitedProductServiceV1 {
 				ItemAmount::limitedProductItemId,
 				item -> {
 					UUID itemId = item.limitedProductItemId();
+					productCacheRepository.checkCache(itemId);
 					int stock = productCacheRepository.getStock(itemId);
 					int reservation = productCacheRepository.getReservation(itemId);
 					return ProductStockCache.create(stock, reservation);

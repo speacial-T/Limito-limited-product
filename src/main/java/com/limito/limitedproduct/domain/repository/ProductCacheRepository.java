@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface ProductCacheRepository {
 
-	void initCache(UUID itemId, int stock);
+	void checkCache(UUID itemId);
 
 	int getStock(UUID itemId);
 
