@@ -12,9 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE) // 공통 핸들러보다 먼저 먹게
-@RestControllerAdvice
-// @RestControllerAdvice(basePackages = "com.limito.limitedproduct")
-public class LimitedProductExceptionHandler {
+@RestControllerAdvice(basePackages = "com.limito.limitedproduct")
+public class LimitedProductInternalExceptionHandler {
 
 	@ExceptionHandler(LimitedProductInternalException.class)
 	public ResponseEntity<LimitedProductErrorResponse> handleLimitedProductInternalException(
