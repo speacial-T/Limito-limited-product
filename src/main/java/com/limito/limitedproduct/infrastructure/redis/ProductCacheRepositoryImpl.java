@@ -72,16 +72,29 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 	@Override
 	public void reserve(UUID itemId, int amount) {
-		checkCanReserve(itemId, amount);
-		hashOps().increment(key(itemId), FIELD_RESERVATION, amount);
+		checkCanOrder(itemId, amount);
+		increaseReservation(itemId, amount);
 	}
 
 	@Override
 	public void cancelReservation(UUID itemId, int amount) {
-		hashOps().increment(key(itemId), FIELD_RESERVATION, -amount);
+		decreaseReservation(itemId, amount);
 	}
 
-	private void checkCanReserve(UUID itemId, int amount) {
+	@Override
+	public void reduceStock(UUID itemId, int amount) {
+		checkCanOrder(itemId, amount);
+		decreaseStock(itemId, amount);
+		decreaseReservation(itemId, amount);
+	}
+
+	@Override
+	public void cancelReduction(UUID itemId, int amount) {
+		increaseStock(itemId, amount);
+		increaseReservation(itemId, amount);
+	}
+
+	private void checkCanOrder(UUID itemId, int amount) {
 		int stock = getStock(itemId);
 		int reservation = getReservation(itemId);
 		int remainingStock = stock - reservation;
@@ -89,5 +102,26 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 		if (amount > remainingStock) {
 			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
 		}
+	}
+
+	@Override
+	public boolean checkSoldOut(UUID itemId) {
+		return getStock(itemId) == 0;
+	}
+
+	private void increaseReservation(UUID itemId, int amount) {
+		hashOps().increment(key(itemId), FIELD_RESERVATION, amount);
+	}
+
+	private void decreaseReservation(UUID itemId, int amount) {
+		hashOps().increment(key(itemId), FIELD_RESERVATION, -amount);
+	}
+
+	private void increaseStock(UUID itemId, int amount) {
+		hashOps().increment(key(itemId), FIELD_STOCK, amount);
+	}
+
+	private void decreaseStock(UUID itemId, int amount) {
+		hashOps().increment(key(itemId), FIELD_STOCK, -amount);
 	}
 }

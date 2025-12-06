@@ -11,4 +11,10 @@ public interface ProductCacheRepository {
 	void reserve(UUID itemId, int amount);
 
 	void cancelReservation(UUID itemId, int amount);
+
+	void reduceStock(UUID itemId, int amount);
+
+	void cancelReduction(UUID itemId, int amount);
+
+	boolean checkSoldOut(UUID itemId);
 }
