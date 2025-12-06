@@ -50,6 +50,7 @@ public class ProductItem {
 	@ColumnDefault("FALSE")
 	private boolean isSoldOut;
 
+	@Getter
 	@Column(name = "purchase_amount_limit", nullable = false)
 	@ColumnDefault("2147483647")
 	private int purchaseAmountLimit;
