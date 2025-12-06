@@ -39,10 +39,13 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 			LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID)
 		);
 
-		hashOps().put(key, FIELD_STOCK, String.valueOf(productItem.getStock()));
-		hashOps().put(key, FIELD_RESERVATION, "0");
+		hashOps().putIfAbsent(key, FIELD_STOCK, String.valueOf(productItem.getStock()));
+		hashOps().putIfAbsent(key, FIELD_RESERVATION, "0");
 
-		return Pair.of(productItem.getStock(), 0);
+		int stock = Integer.parseInt(hashOps().get(key, FIELD_STOCK));
+		int reservation = Integer.parseInt(hashOps().get(key, FIELD_RESERVATION));
+
+		return Pair.of(stock, reservation);
 	}
 
 	@Override
