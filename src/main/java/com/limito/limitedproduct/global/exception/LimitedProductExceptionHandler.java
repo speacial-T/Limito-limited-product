@@ -17,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 public class LimitedProductExceptionHandler {
 
 	@ExceptionHandler(LimitedProductInternalException.class)
-	public ResponseEntity<LimitedProductErrorResponse> handleAppException(LimitedProductInternalException exception) {
+	public ResponseEntity<LimitedProductErrorResponse> handleLimitedProductInternalException(
+		LimitedProductInternalException exception
+	) {
 		log.error("[LimitedProductInternalException] status={} errorCode={} message={}",
 			exception.getStatus(), exception.getErrorCode(), exception.getMessage(), exception);
 
