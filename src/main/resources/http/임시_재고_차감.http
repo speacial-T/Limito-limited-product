@@ -1,0 +1,21 @@
+# POST UPDATE - 임시 재고 차감(성공)
+POST http://localhost:19034/internal/v1/limited-products/stock/reduce
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "limitedProductOptionId": "10000000-0000-0000-0000-000000000001",
+      "items": [
+        {
+          "limitedProductItemId": "40000000-0000-0000-0000-000000000001",
+          "amount": 2
+        },
+        {
+          "limitedProductItemId": "40000000-0000-0000-0000-000000000002",
+          "amount": 2
+        }
+      ]
+    }
+  ]
+}
