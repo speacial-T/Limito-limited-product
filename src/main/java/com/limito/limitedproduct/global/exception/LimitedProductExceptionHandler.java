@@ -23,7 +23,6 @@ public class LimitedProductExceptionHandler {
 		log.error("[LimitedProductInternalException] status={} errorCode={} message={}",
 			exception.getStatus(), exception.getErrorCode(), exception.getMessage(), exception);
 
-		// AppException은 status + message만 사용
 		return LimitedProductErrorResponse.limitedProductErrorResponse(
 			exception.getStatus(), exception.getErrorCode(), exception.getMessage()
 		);

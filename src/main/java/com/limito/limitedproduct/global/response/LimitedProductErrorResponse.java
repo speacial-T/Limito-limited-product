@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 
 public record LimitedProductErrorResponse(String errorCode, String message) {
 
-	// HttpStatus + message 기반
 	public static ResponseEntity<LimitedProductErrorResponse> limitedProductErrorResponse(
 		HttpStatus status, String errorCode, String message
 	) {
