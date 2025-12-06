@@ -1,0 +1,16 @@
+# POST CREATE - 주문 수량 예약(성공)
+POST http://localhost:19034/internal/v1/limited-products/stock/reserve
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "limitedProductItemId": "40000000-0000-0000-0000-000000000001",
+      "amount": 2
+    },
+    {
+      "limitedProductItemId": "40000000-0000-0000-0000-000000000002",
+      "amount": 2
+    }
+  ]
+}
