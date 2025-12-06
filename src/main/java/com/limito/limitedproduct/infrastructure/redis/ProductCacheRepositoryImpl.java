@@ -72,14 +72,12 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 	@Override
 	public void reserve(UUID itemId, int amount) {
-		int reservation = checkCanReserve(itemId, amount);
-		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation + amount));
+		hashOps().increment(key(itemId), FIELD_RESERVATION, amount);
 	}
 
 	@Override
 	public void cancelReservation(UUID itemId, int amount) {
-		int reservation = getReservation(itemId);
-		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation - amount));
+		hashOps().increment(key(itemId), FIELD_RESERVATION, -amount);
 	}
 
 	private int checkCanReserve(UUID itemId, int amount) {
