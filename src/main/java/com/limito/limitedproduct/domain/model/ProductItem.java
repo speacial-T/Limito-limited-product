@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,12 +18,10 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_limited_product_items")
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
@@ -53,4 +54,21 @@ public class ProductItem {
 	@ManyToOne
 	@JoinColumn(name = "limited_product_option_id", nullable = false, updatable = false)
 	private ProductOption productOption;
+
+	public void validateProductOptionOpened() {
+		productOption.validateProductOptionOpened();
+	}
+
+	public void validateProductItemIsNotSoldOut() {
+		if (isSoldOut) {
+			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_NOT_OPENED);
+		}
+	}
+
+	public void validatePurchaseAmountLimit(int amount) {
+		if (amount > purchaseAmountLimit) {
+			throw LimitedProductInternalException.of(
+				LimitedProductInternalErrorCode.PRODUCT_ITEM_OVER_PURCHASE_AMOUNT_LIMIT);
+		}
+	}
 }
