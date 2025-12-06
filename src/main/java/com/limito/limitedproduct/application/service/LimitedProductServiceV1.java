@@ -2,15 +2,12 @@ package com.limito.limitedproduct.application.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.limito.limitedproduct.domain.model.ProductItem;
-import com.limito.limitedproduct.domain.model.ProductStockCache;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
@@ -62,31 +59,13 @@ public class LimitedProductServiceV1 {
 				.toList()
 		);
 
-		Map<UUID, ProductStockCache> itemStockCache = cacheItemStock(request.items());
 		for (ItemAmount itemAmount : request.items()) {
-			itemStockCache
-				.get(itemAmount.limitedProductItemId())
-				.checkCanReserve(itemAmount.amount());
+			productCacheRepository.checkCanReserve(itemAmount.limitedProductItemId(), itemAmount.amount());
 		}
 
 		for (ItemAmount itemAmount : request.items()) {
 			productCacheRepository.reserve(itemAmount.limitedProductItemId(), itemAmount.amount());
 		}
-	}
-
-	private Map<UUID, ProductStockCache> cacheItemStock(List<ItemAmount> itemAmountList) {
-		return itemAmountList
-			.stream()
-			.collect(Collectors.toMap(
-				ItemAmount::limitedProductItemId,
-				item -> {
-					UUID itemId = item.limitedProductItemId();
-					productCacheRepository.checkCache(itemId);
-					int stock = productCacheRepository.getStock(itemId);
-					int reservation = productCacheRepository.getReservation(itemId);
-					return ProductStockCache.create(stock, reservation);
-				}
-			));
 	}
 
 	private void validateDuplicateId(List<UUID> requestItemIdList) {

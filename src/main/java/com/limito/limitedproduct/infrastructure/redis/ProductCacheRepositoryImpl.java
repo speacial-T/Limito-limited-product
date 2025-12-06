@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
 import com.limito.limitedproduct.domain.model.ProductItem;
@@ -32,17 +33,7 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 		return "item:" + itemId;
 	}
 
-	@Override
-	public void checkCache(UUID itemId) {
-		String stock = hashOps().get(key(itemId), FIELD_STOCK);
-		String reservation = hashOps().get(key(itemId), FIELD_RESERVATION);
-
-		if (stock == null || reservation == null) {
-			initCache(itemId);
-		}
-	}
-
-	private void initCache(UUID itemId) {
+	private Pair<Integer, Integer> initCache(UUID itemId) {
 		String key = key(itemId);
 		ProductItem productItem = productItemJpaRepository.findById(itemId).orElseThrow(() ->
 			LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID)
@@ -50,22 +41,46 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 		hashOps().put(key, FIELD_STOCK, String.valueOf(productItem.getStock()));
 		hashOps().put(key, FIELD_RESERVATION, "0");
+
+		return Pair.of(productItem.getStock(), 0);
 	}
 
 	@Override
 	public int getStock(UUID itemId) {
 		String stock = hashOps().get(key(itemId), FIELD_STOCK);
-		return (stock == null) ? 0 : Integer.parseInt(stock);
+
+		if (stock == null) {
+			return initCache(itemId).getFirst();
+		}
+
+		return Integer.parseInt(stock);
 	}
 
 	@Override
 	public int getReservation(UUID itemId) {
 		String reservation = hashOps().get(key(itemId), FIELD_RESERVATION);
-		return (reservation == null) ? 0 : Integer.parseInt(reservation);
+
+		if (reservation == null) {
+			return initCache(itemId).getSecond();
+		}
+
+		return Integer.parseInt(reservation);
 	}
 
 	@Override
-	public void reserve(UUID itemId, int reservation) {
-		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation));
+	public void checkCanReserve(UUID itemId, int amount) {
+		int stock = getStock(itemId);
+		int reservation = getReservation(itemId);
+		int remainingStock = stock - reservation;
+
+		if (amount > remainingStock) {
+			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
+		}
+	}
+
+	@Override
+	public void reserve(UUID itemId, int amount) {
+		int reservation = getReservation(itemId);
+		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation + amount));
 	}
 }

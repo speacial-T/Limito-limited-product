@@ -4,11 +4,11 @@ import java.util.UUID;
 
 public interface ProductCacheRepository {
 
-	void checkCache(UUID itemId);
-
 	int getStock(UUID itemId);
 
 	int getReservation(UUID itemId);
 
-	void reserve(UUID itemId, int reservation);
+	void checkCanReserve(UUID itemId, int amount);
+
+	void reserve(UUID itemId, int amount);
 }
