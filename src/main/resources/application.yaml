@@ -23,7 +23,7 @@ spring:
       port: 6379
 
 
-eureka:
-  client:
-    service-url:
-      default-zone: http://localhost:19090/eureka
+#eureka:
+#  client:
+#    service-url:
+#      default-zone: http://localhost:19090/eureka
