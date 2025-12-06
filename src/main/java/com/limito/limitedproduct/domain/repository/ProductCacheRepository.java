@@ -8,7 +8,7 @@ public interface ProductCacheRepository {
 
 	int getReservation(UUID itemId);
 
-	void checkCanReserve(UUID itemId, int amount);
-
 	void reserve(UUID itemId, int amount);
+
+	void cancelReservation(UUID itemId, int amount);
 }

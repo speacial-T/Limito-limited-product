@@ -1,5 +1,6 @@
 package com.limito.limitedproduct.application.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,12 +59,17 @@ public class LimitedProductServiceV1 {
 			.collect(Collectors.toMap(ProductItem::getId, Function.identity()));
 		validatePurchaseAmountLimit(productItemMap, request.items());
 
-		for (ItemAmount itemAmount : request.items()) {
-			productCacheRepository.checkCanReserve(itemAmount.limitedProductItemId(), itemAmount.amount());
-		}
-
-		for (ItemAmount itemAmount : request.items()) {
-			productCacheRepository.reserve(itemAmount.limitedProductItemId(), itemAmount.amount());
+		List<ItemAmount> reservedItem = new ArrayList<>();
+		try {
+			for (ItemAmount itemAmount : request.items()) {
+				productCacheRepository.reserve(itemAmount.limitedProductItemId(), itemAmount.amount());
+				reservedItem.add(itemAmount);
+			}
+		} catch (Exception e) {
+			for (ItemAmount itemAmount : reservedItem) {
+				productCacheRepository.cancelReservation(itemAmount.limitedProductItemId(), itemAmount.amount());
+			}
+			throw e;
 		}
 	}
 

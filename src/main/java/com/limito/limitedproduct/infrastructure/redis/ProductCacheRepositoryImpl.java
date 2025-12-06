@@ -68,7 +68,18 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 	}
 
 	@Override
-	public void checkCanReserve(UUID itemId, int amount) {
+	public void reserve(UUID itemId, int amount) {
+		int reservation = checkCanReserve(itemId, amount);
+		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation + amount));
+	}
+
+	@Override
+	public void cancelReservation(UUID itemId, int amount) {
+		int reservation = getReservation(itemId);
+		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation - amount));
+	}
+
+	private int checkCanReserve(UUID itemId, int amount) {
 		int stock = getStock(itemId);
 		int reservation = getReservation(itemId);
 		int remainingStock = stock - reservation;
@@ -76,11 +87,7 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 		if (amount > remainingStock) {
 			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
 		}
-	}
 
-	@Override
-	public void reserve(UUID itemId, int amount) {
-		int reservation = getReservation(itemId);
-		hashOps().put(key(itemId), FIELD_RESERVATION, String.valueOf(reservation + amount));
+		return reservation;
 	}
 }
