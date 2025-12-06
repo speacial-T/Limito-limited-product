@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import com.limito.limitedproduct.domain.model.ProductItem;
 
-public interface LimitedProductItemRepository {
+public interface ProductItemRepository {
 
 	List<ProductItem> findAllById(List<UUID> uuids);
+
+	void soldOut(UUID uuid);
 }
