@@ -2,8 +2,11 @@ package com.limito.limitedproduct.application.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -30,8 +33,7 @@ public class LimitedProductServiceV1 {
 		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
 	) {
 		List<ProductItem> productItemList = productItemRepository.findAllById(
-			getPurchaseAmountLimitRequestV1
-				.itemIdList()
+			getPurchaseAmountLimitRequestV1.itemIdList()
 				.stream()
 				.toList()
 		);
@@ -51,13 +53,10 @@ public class LimitedProductServiceV1 {
 
 		validateOpened(productItemList);
 		validateIsNotSoldOut(productItemList);
-		validatePurchaseAmountLimit(
-			productItemList,
-			request.items()
-				.stream()
-				.map(ItemAmount::amount)
-				.toList()
-		);
+
+		Map<UUID, ProductItem> productItemMap = productItemList.stream()
+			.collect(Collectors.toMap(ProductItem::getId, Function.identity()));
+		validatePurchaseAmountLimit(productItemMap, request.items());
 
 		for (ItemAmount itemAmount : request.items()) {
 			productCacheRepository.checkCanReserve(itemAmount.limitedProductItemId(), itemAmount.amount());
@@ -88,10 +87,10 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	private void validatePurchaseAmountLimit(List<ProductItem> productItemList, List<Integer> requestAmountList) {
-		for (int i = 0; i < productItemList.size(); i++) {
-			productItemList.get(i)
-				.validatePurchaseAmountLimit(requestAmountList.get(i));
+	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList, List<ItemAmount> itemAmountList) {
+		for (ItemAmount itemAmount : itemAmountList) {
+			ProductItem productItem = productItemList.get(itemAmount.limitedProductItemId());
+			productItem.validatePurchaseAmountLimit(itemAmount.amount());
 		}
 	}
 }

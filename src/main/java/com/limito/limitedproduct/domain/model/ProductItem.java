@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductItem {
 
+	@Getter
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "limited_product_item_id", nullable = false, updatable = false)
