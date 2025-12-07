@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
@@ -75,6 +76,7 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
+	@Transactional
 	public void reduceStock(ReduceStockRequestV1 request) {
 		List<UUID> requestOptionIdList = request.products()
 			.stream()
