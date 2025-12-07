@@ -5,11 +5,7 @@ Content-Type: application/json
 {
   "items": [
     {
-      "limitedProductItemId": "40000000-0000-0000-0000-000000000001",
-      "amount": 2
-    },
-    {
-      "limitedProductItemId": "40000000-0000-0000-0000-000000000002",
+      "limitedProductItemId": "40000000-0000-0000-0000-000000000003",
       "amount": 2
     }
   ]

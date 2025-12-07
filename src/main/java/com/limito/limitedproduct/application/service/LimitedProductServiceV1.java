@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
+import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LimitedProductServiceV1 {
 
+	private final ProductOptionRepository productOptionRepository;
 	private final ProductItemRepository productItemRepository;
 	private final ProductCacheRepository productCacheRepository;
 
@@ -107,7 +109,10 @@ public class LimitedProductServiceV1 {
 
 		for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
 			if (productCacheRepository.checkSoldOut(reduceStockProductRequest.limitedProductItemId())) {
-				productItemRepository.soldOut(reduceStockProductRequest.limitedProductItemId());
+				productOptionRepository.soldOut(
+					reduceStockProductRequest.limitedProductOptionId(),
+					reduceStockProductRequest.limitedProductItemId()
+				);
 			}
 		}
 	}

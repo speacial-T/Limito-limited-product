@@ -1,7 +1,7 @@
 package com.limito.limitedproduct.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -20,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKey;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -58,11 +59,22 @@ public class ProductOption {
 	private Product product;
 
 	@OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductItem> itemList;
+	@MapKey(name = "id")
+	private Map<UUID, ProductItem> itemList;
 
 	public void validateProductOptionOpened() {
 		if (status != OptionStatus.OPEN) {
 			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_NOT_OPENED);
 		}
+	}
+
+	public void makeItemSoldOut(UUID productItemId) {
+		ProductItem productItem = itemList.get(productItemId);
+
+		if (productItem == null) {
+			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+		}
+
+		productItem.soldOut();
 	}
 }

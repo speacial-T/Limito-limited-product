@@ -75,4 +75,9 @@ public class ProductItem {
 				LimitedProductInternalErrorCode.PRODUCT_ITEM_OVER_PURCHASE_AMOUNT_LIMIT);
 		}
 	}
+
+	public void soldOut() {
+		isSoldOut = true;
+		stock = 0;
+	}
 }

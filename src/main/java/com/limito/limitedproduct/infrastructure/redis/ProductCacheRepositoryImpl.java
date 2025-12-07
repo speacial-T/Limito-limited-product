@@ -83,7 +83,6 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 	@Override
 	public void reduceStock(UUID itemId, int amount) {
-		checkCanOrder(itemId, amount);
 		decreaseStock(itemId, amount);
 		decreaseReservation(itemId, amount);
 	}

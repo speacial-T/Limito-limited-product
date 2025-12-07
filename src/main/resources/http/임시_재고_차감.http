@@ -5,17 +5,9 @@ Content-Type: application/json
 {
   "products": [
     {
-      "limitedProductOptionId": "10000000-0000-0000-0000-000000000001",
-      "items": [
-        {
-          "limitedProductItemId": "40000000-0000-0000-0000-000000000001",
-          "amount": 2
-        },
-        {
-          "limitedProductItemId": "40000000-0000-0000-0000-000000000002",
-          "amount": 2
-        }
-      ]
+      "limitedProductOptionId": "10000000-0000-0000-0000-000000000002",
+      "limitedProductItemId": "40000000-0000-0000-0000-000000000003",
+      "amount": 2
     }
   ]
 }
