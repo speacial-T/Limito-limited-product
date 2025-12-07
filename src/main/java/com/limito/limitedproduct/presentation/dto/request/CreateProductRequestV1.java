@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 public record CreateProductRequestV1(
@@ -49,13 +50,13 @@ public record CreateProductRequestV1(
 		String size,
 
 		@NotNull(message = "가격은 null일 수 없습니다.")
-		@Positive(message = "최소 구매가는 0원입니다.")
+		@PositiveOrZero(message = "가격은 0원 이상의 값이어야 합니다.")
 		int price,
 
 		@Positive(message = "최소 구매 제한 수량은 1개입니다.")
 		Integer purchaseAmountLimit,
 
-		@Positive(message = "재고는 1개 이상 입니다.")
+		@PositiveOrZero(message = "재고는 0개 이상 입니다.")
 		Integer stock
 	) {
 	}
