@@ -1,0 +1,38 @@
+package com.limito.limitedproduct.presentation.controller;
+
+import java.net.URI;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
+import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/limited-products")
+@RequiredArgsConstructor
+public class LimitedProductControllerV1 {
+
+	private final LimitedProductServiceV1 limitedProductServiceV1;
+
+	@PostMapping("")
+	public ResponseEntity<CreateProductResponseV1> createProduct(
+		// @AuthenticationPrincipal UserDetailImpl userDetail,
+		@Valid @RequestBody CreateProductRequestV1 request
+	) {
+		//TODO: common 라이브러리를 통해 인증 정보 가져오는 코드로 변경하기
+		Long userId = 1L;
+
+		CreateProductResponseV1 response = limitedProductServiceV1.createProduct(userId, request);
+
+		//TODO: 상품 단건 조회 구현 후 링크 수정 -> /api/v1/limited-products/{optionId}
+		return ResponseEntity.created(URI.create("")).body(response);
+	}
+}
