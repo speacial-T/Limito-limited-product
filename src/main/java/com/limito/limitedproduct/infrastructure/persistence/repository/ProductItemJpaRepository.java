@@ -5,10 +5,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.limito.limitedproduct.domain.model.ProductItem;
-
-import io.lettuce.core.dynamic.annotation.Param;
 
 public interface ProductItemJpaRepository extends JpaRepository<ProductItem, UUID> {
 
