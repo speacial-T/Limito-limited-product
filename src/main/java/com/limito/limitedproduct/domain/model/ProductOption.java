@@ -82,7 +82,7 @@ public class ProductOption {
 	}
 
 	public void initStatus() {
-		if (this.openAt.isBefore(LocalDateTime.now())) {
+		if (!this.openAt.isAfter(LocalDateTime.now())) {
 			this.status = OptionStatus.OPEN;
 		}
 	}
