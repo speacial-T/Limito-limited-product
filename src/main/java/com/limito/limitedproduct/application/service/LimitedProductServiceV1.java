@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
+import com.limito.limitedproduct.domain.repository.ProductOptionQueryRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
 import com.limito.limitedproduct.domain.vo.ProductItem;
@@ -31,18 +34,24 @@ import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LimitedProductServiceV1 {
 
 	private final ProductRepository productRepository;
 	private final ProductOptionRepository productOptionRepository;
 	private final ProductItemRepository productItemRepository;
+
 	private final ProductCacheRepository productCacheRepository;
+
+	private final ProductOptionQueryRepository productOptionQueryRepository;
 
 	@Transactional
 	public CreateProductResponseV1 createProduct(Long userId, CreateProductRequestV1 request) {
@@ -81,14 +90,20 @@ public class LimitedProductServiceV1 {
 		return LimitedProductMapper.toGetProductOptionResponse(product, productOption);
 	}
 
+	public GetProductsByCategoryResponseV1 getProductsByCategory(UUID categoryId, Pageable pageable) {
+		// TODO: 카테고리 캐싱해와서 정보 가져오기
+		String category = "임시 카테고리명";
+
+		PagedModel<ProductAndOptionResponse> productAndOptionList
+			= productOptionQueryRepository.findOptionsByCategoryId(categoryId, pageable);
+
+		return LimitedProductMapper.toGetProductsByCategoryResponse(categoryId, category, productAndOptionList);
+	}
+
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(
-		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
-	) {
+		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1) {
 		List<ProductItem> productItemList = productItemRepository.findAllById(
-			getPurchaseAmountLimitRequestV1.itemIdList()
-				.stream()
-				.toList()
-		);
+			getPurchaseAmountLimitRequestV1.itemIdList().stream().toList());
 
 		return GetPurchaseAmountLimitResponseV1.of(productItemList);
 	}
@@ -128,8 +143,7 @@ public class LimitedProductServiceV1 {
 	@Transactional
 	public void reduceStock(ReduceStockRequestV1 request) {
 		List<ReduceStockProductRequest> reduceStockProductRequestList = request.products();
-		List<UUID> requestItemIdList = reduceStockProductRequestList
-			.stream()
+		List<UUID> requestItemIdList = reduceStockProductRequestList.stream()
 			.map(ReduceStockProductRequest::limitedProductItemId)
 			.toList();
 		validateDuplicateId(requestItemIdList);
@@ -137,28 +151,22 @@ public class LimitedProductServiceV1 {
 		List<ReduceStockProductRequest> reducedItemList = new ArrayList<>();
 		try {
 			for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
-				productCacheRepository.reduceStock(
-					reduceStockProductRequest.limitedProductItemId(),
-					reduceStockProductRequest.amount()
-				);
+				productCacheRepository.reduceStock(reduceStockProductRequest.limitedProductItemId(),
+					reduceStockProductRequest.amount());
 				reducedItemList.add(reduceStockProductRequest);
 			}
 		} catch (Exception e) {
 			for (ReduceStockProductRequest reduceStockProductRequest : reducedItemList) {
-				productCacheRepository.cancelReduction(
-					reduceStockProductRequest.limitedProductItemId(),
-					reduceStockProductRequest.amount()
-				);
+				productCacheRepository.cancelReduction(reduceStockProductRequest.limitedProductItemId(),
+					reduceStockProductRequest.amount());
 			}
 			throw e;
 		}
 
 		for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
 			if (productCacheRepository.checkSoldOut(reduceStockProductRequest.limitedProductItemId())) {
-				productOptionRepository.soldOut(
-					reduceStockProductRequest.limitedProductOptionId(),
-					reduceStockProductRequest.limitedProductItemId()
-				);
+				productOptionRepository.soldOut(reduceStockProductRequest.limitedProductOptionId(),
+					reduceStockProductRequest.limitedProductItemId());
 			}
 		}
 	}
@@ -183,10 +191,8 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	private void validatePurchaseAmountLimit(
-		Map<UUID, ProductItem> productItemList,
-		List<ReserveStockItemRequest> itemAmountList
-	) {
+	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList,
+		List<ReserveStockItemRequest> itemAmountList) {
 		for (ReserveStockItemRequest reserveStockItemRequest : itemAmountList) {
 			ProductItem productItem = productItemList.get(reserveStockItemRequest.limitedProductItemId());
 			productItem.validatePurchaseAmountLimit(reserveStockItemRequest.amount());

@@ -1,5 +1,9 @@
 package com.limito.limitedproduct.domain.mapper;
 
+import java.util.UUID;
+
+import org.springframework.data.web.PagedModel;
+
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.vo.ProductItem;
@@ -10,6 +14,8 @@ import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
 public class LimitedProductMapper {
 
@@ -115,6 +121,18 @@ public class LimitedProductMapper {
 			.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
 			.stock(productItem.getStock())
 			.soldOut(productItem.isSoldOut())
+			.build();
+	}
+
+	public static GetProductsByCategoryResponseV1 toGetProductsByCategoryResponse(
+		UUID categoryId,
+		String category,
+		PagedModel<ProductAndOptionResponse> productAndOptionList
+	) {
+		return GetProductsByCategoryResponseV1.builder()
+			.categoryId(categoryId)
+			.category(category)
+			.data(productAndOptionList)
 			.build();
 	}
 }
