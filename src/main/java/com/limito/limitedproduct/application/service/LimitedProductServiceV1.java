@@ -68,8 +68,8 @@ public class LimitedProductServiceV1 {
 				reservedItemList.add(stockItem);
 			}
 		} catch (Exception e) {
-			for (StockItem itemAmount : reservedItemList) {
-				productCacheRepository.cancelReservation(itemAmount.limitedProductItemId(), itemAmount.amount());
+			for (StockItem reservedItem : reservedItemList) {
+				productCacheRepository.cancelReservation(reservedItem.limitedProductItemId(), reservedItem.amount());
 			}
 			throw e;
 		}
@@ -134,10 +134,10 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList, List<StockItem> itemAmountList) {
-		for (StockItem itemAmount : itemAmountList) {
-			ProductItem productItem = productItemList.get(itemAmount.limitedProductItemId());
-			productItem.validatePurchaseAmountLimit(itemAmount.amount());
+	private void validatePurchaseAmountLimit(Map<UUID, ProductItem> productItemList, List<StockItem> stockItemList) {
+		for (StockItem stockItem : stockItemList) {
+			ProductItem productItem = productItemList.get(stockItem.limitedProductItemId());
+			productItem.validatePurchaseAmountLimit(stockItem.amount());
 		}
 	}
 }
