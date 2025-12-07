@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.limito.limitedproduct.domain.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
@@ -44,7 +45,7 @@ public class LimitedProductServiceV1 {
 				.toList()
 		);
 
-		return GetPurchaseAmountLimitResponseV1.of(productItemList);
+		return LimitedProductMapper.toGetPurchaseAmountLimitResponse(productItemList);
 	}
 
 	public void reserveStock(ReserveStockRequestV1 request) {
