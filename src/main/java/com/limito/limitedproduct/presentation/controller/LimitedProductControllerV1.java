@@ -1,8 +1,11 @@
 package com.limito.limitedproduct.presentation.controller;
 
 import java.net.URI;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +47,12 @@ public class LimitedProductControllerV1 {
 				)
 			)
 			.body(response);
+	}
+
+	@GetMapping("/{limitedProductOptionId}")
+	public ResponseEntity<GetProductOptionResponseV1> getProductOption(@PathVariable UUID limitedProductOptionId) {
+		GetProductOptionResponseV1 response = limitedProductServiceV1.getProductOption(limitedProductOptionId);
+
+		return ResponseEntity.ok(response);
 	}
 }

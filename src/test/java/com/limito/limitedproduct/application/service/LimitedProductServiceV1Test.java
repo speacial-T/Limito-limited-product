@@ -46,8 +46,8 @@ class LimitedProductServiceV1Test {
 		when(productItemRepository.findAllById(wrongUUIDItemIdList))
 			.thenThrow(
 				AppException.of(
-					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
-					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage()
+					LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getStatus(),
+					LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getMessage()
 				)
 			);
 	}
@@ -55,7 +55,7 @@ class LimitedProductServiceV1Test {
 	private void 예상한_예외가_발생했는지_검증한다() {
 		assertThatThrownBy(() -> limitedProductServiceV1.getPurchaseAmountLimits(wrongUUIDRequest))
 			.isInstanceOf(AppException.class)
-			.hasMessageContaining(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage());
+			.hasMessageContaining(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getMessage());
 		verify(productItemRepository, times(1)).findAllById(wrongUUIDItemIdList);
 	}
 

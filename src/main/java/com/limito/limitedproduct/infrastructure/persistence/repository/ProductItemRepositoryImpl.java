@@ -29,7 +29,7 @@ public class ProductItemRepositoryImpl implements ProductItemRepository {
 
 	private void validateFindAllById(List<UUID> request, List<ProductItem> response) {
 		if (request.size() != response.size()) {
-			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID);
 		}
 	}
 }

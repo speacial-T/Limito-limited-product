@@ -6,9 +6,10 @@ import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductItemResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductOptionResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductItemResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductOptionResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductResponseInfo;
 
 public class LimitedProductMapper {
 
@@ -42,6 +43,37 @@ public class LimitedProductMapper {
 
 	public static CreateProductResponseV1 toCreateProductResponse(Product product, ProductOption productOption) {
 		return CreateProductResponseV1.builder()
+			.productInfo(
+				ProductResponseInfo.builder()
+					.limitedProductId(product.getId())
+					.categoryId(product.getCategoryId())
+					.name(product.getName())
+					.sellerId(product.getSellerId())
+					.brandName(product.getBrandName())
+					.build()
+			)
+			.productOptionInfo(
+				ProductOptionResponseInfo.builder()
+					.limitedProductOptionId(productOption.getId())
+					.modelNumber(productOption.getModelNumber())
+					.thumbnailUrl(productOption.getThumbnailUrl())
+					.details(productOption.getDetails())
+					.color(productOption.getColor())
+					.openAt(productOption.getOpenAt())
+					.status(productOption.getStatus().name())
+					.build()
+			)
+			.productItems(
+				productOption.getItemList()
+					.stream()
+					.map(LimitedProductMapper::toProductItemResponseInfo)
+					.toList()
+			)
+			.build();
+	}
+
+	public static GetProductOptionResponseV1 toGetProductOptionResponse(Product product, ProductOption productOption) {
+		return GetProductOptionResponseV1.builder()
 			.productInfo(
 				ProductResponseInfo.builder()
 					.limitedProductId(product.getId())
