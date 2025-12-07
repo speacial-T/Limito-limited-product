@@ -32,7 +32,16 @@ public class LimitedProductControllerV1 {
 
 		CreateProductResponseV1 response = limitedProductServiceV1.createProduct(userId, request);
 
-		//TODO: 상품 단건 조회 구현 후 링크 수정 -> /api/v1/limited-products/{optionId}
-		return ResponseEntity.created(URI.create("")).body(response);
+		return ResponseEntity
+			.created(
+				URI.create(
+					String.format(
+						"/api/v1/limited-products/%s",
+						response.getProductOptionInfo()
+							.getLimitedProductOptionId()
+					)
+				)
+			)
+			.body(response);
 	}
 }
