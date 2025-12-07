@@ -70,7 +70,7 @@ public class Product {
 
 	public void validateBrandName(String brandName) {
 		if (!this.brandName.equals(brandName)) {
-			throw AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_CATEGORY_ID);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_BRAND_NAME);
 		}
 	}
 }
