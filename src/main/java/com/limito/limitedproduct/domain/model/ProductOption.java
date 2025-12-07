@@ -54,6 +54,9 @@ public class ProductOption {
 	@Enumerated(EnumType.STRING)
 	private OptionStatus status = OptionStatus.READY;
 
+	@Column(name = "sold_out", nullable = false)
+	private boolean isSoldOut = false;
+
 	@Column(name = "limited_product_id", nullable = false, updatable = false)
 	private UUID productId;
 
@@ -99,15 +102,29 @@ public class ProductOption {
 		for (ProductItem productItem : productItemList) {
 			productItem.attachProductOption(this);
 		}
+		checkAllSoldOut();
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
+		//TODO: for-if 개선 필요
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(productItemId)) {
 				productItem.soldOut();
+				checkAllSoldOut();
 				return;
 			}
 		}
 		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+	}
+
+	private void checkAllSoldOut() {
+		//TODO: for-if 개선 필요
+		for (ProductItem productItem : itemList) {
+			if (!productItem.isSoldOut()) {
+				this.isSoldOut = false;
+				return;
+			}
+			this.isSoldOut = true;
+		}
 	}
 }

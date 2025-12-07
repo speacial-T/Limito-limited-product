@@ -61,6 +61,7 @@ public class LimitedProductMapper {
 					.color(productOption.getColor())
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
+					.soldOut(productOption.isSoldOut())
 					.build()
 			)
 			.productItems(
@@ -92,6 +93,7 @@ public class LimitedProductMapper {
 					.color(productOption.getColor())
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
+					.soldOut(productOption.isSoldOut())
 					.build()
 			)
 			.productItems(
