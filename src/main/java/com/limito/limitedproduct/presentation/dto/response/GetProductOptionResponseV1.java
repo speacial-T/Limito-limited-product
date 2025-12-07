@@ -2,9 +2,9 @@ package com.limito.limitedproduct.presentation.dto.response;
 
 import java.util.List;
 
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductItemResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductOptionResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductResponseInfo;
+import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
+import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
+import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -3,13 +3,13 @@ package com.limito.limitedproduct.domain.mapper;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
+import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
+import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductItemResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductOptionResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponse.ProductResponseInfo;
 
 public class LimitedProductMapper {
 
