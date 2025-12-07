@@ -1,7 +1,7 @@
 package com.limito.limitedproduct.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import com.limito.limitedproduct.domain.vo.OptionStatus;
@@ -17,9 +17,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKey;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -61,8 +58,7 @@ public class ProductOption {
 	private UUID productId;
 
 	@OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)
-	@MapKey(name = "id")
-	private Map<UUID, ProductItem> itemList;
+	private List<ProductItem> itemList;
 
 	@Builder
 	private ProductOption(
@@ -103,12 +99,12 @@ public class ProductOption {
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
-		ProductItem productItem = itemList.get(productItemId);
-
-		if (productItem == null) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+		for (ProductItem productItem : itemList) {
+			if (productItem.getId().equals(productItemId)) {
+				productItem.soldOut();
+				return;
+			}
 		}
-
-		productItem.soldOut();
+		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
 	}
 }

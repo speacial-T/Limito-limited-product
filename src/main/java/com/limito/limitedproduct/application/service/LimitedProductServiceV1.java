@@ -20,7 +20,6 @@ import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
 import com.limito.limitedproduct.domain.vo.ProductItem;
-import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
@@ -29,9 +28,8 @@ import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimit
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProductRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ItemAmount;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import lombok.RequiredArgsConstructor;
@@ -179,9 +177,9 @@ public class LimitedProductServiceV1 {
 
 	private void validatePurchaseAmountLimit(
 		Map<UUID, ProductItem> productItemList,
-		List<ReserveStockItemRequest> reserveStockItemRequestList
+		List<ReserveStockItemRequest> itemAmountList
 	) {
-		for (ReserveStockItemRequest reserveStockItemRequest : reserveStockItemRequestList) {
+		for (ReserveStockItemRequest reserveStockItemRequest : itemAmountList) {
 			ProductItem productItem = productItemList.get(reserveStockItemRequest.limitedProductItemId());
 			productItem.validatePurchaseAmountLimit(reserveStockItemRequest.amount());
 		}
