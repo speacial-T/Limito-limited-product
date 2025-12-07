@@ -39,7 +39,7 @@ public class Product {
 	@Column(name = "category_id", nullable = false)
 	private UUID categoryId;
 
-	@Column(name = "name", nullable = false, unique = true, length = 100)
+	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 
 	@Column(name = "seller_id", nullable = false, updatable = false)
