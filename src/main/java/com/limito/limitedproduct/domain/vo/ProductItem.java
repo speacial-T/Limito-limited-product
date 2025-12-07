@@ -93,4 +93,9 @@ public class ProductItem {
 	public void attachProductOption(ProductOption productOption) {
 		this.productOption = productOption;
 	}
+
+	public void soldOut() {
+		isSoldOut = true;
+		stock = 0;
+	}
 }
