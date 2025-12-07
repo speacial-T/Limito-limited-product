@@ -72,7 +72,10 @@ public class ProductOption {
 		this.thumbnailUrl = thumbnailUrl;
 		this.details = details;
 		this.openAt = openAt;
-		this.color = color;
+
+		if (color != null) {
+			this.color = color;
+		}
 	}
 
 	public void validateProductOptionOpened() {

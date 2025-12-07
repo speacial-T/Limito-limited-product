@@ -41,7 +41,6 @@ public record CreateProductRequestV1(
 		@NotNull(message = "출시 일시는 null일 수 없습니다.")
 		LocalDateTime openAt,
 
-		@NotBlank(message = "색상 정보가 없습니다.")
 		String color
 	) {
 	}
