@@ -7,20 +7,20 @@ import org.springframework.stereotype.Repository;
 
 import com.limito.common.exception.AppException;
 import com.limito.limitedproduct.domain.model.ProductItem;
-import com.limito.limitedproduct.domain.repository.LimitedProductItemRepository;
+import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class LimitedProductItemRepositoryImpl implements LimitedProductItemRepository {
+public class ProductItemRepositoryImpl implements ProductItemRepository {
 
-	private final LimitedProductItemJpaRepository limitedProductItemJpaRepository;
+	private final ProductItemJpaRepository productItemJpaRepository;
 
 	@Override
 	public List<ProductItem> findAllById(List<UUID> uuidList) {
-		List<ProductItem> productItemList = limitedProductItemJpaRepository.findAllById(uuidList);
+		List<ProductItem> productItemList = productItemJpaRepository.findAllById(uuidList);
 
 		validateFindAllById(uuidList, productItemList);
 

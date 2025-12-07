@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.limito.common.exception.AppException;
-import com.limito.limitedproduct.domain.repository.LimitedProductItemRepository;
+import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
@@ -23,12 +23,12 @@ import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimi
 class LimitedProductServiceV1Test {
 
 	@Mock
-	private LimitedProductItemRepository limitedProductItemRepository;
+	private ProductItemRepository productItemRepository;
 	@InjectMocks
 	private LimitedProductServiceV1 limitedProductServiceV1;
 
 	private void 상품_아이디가_주어지면_준비된_상품을_반환한다() {
-		when(limitedProductItemRepository.findAllById(correctItemIdList))
+		when(productItemRepository.findAllById(correctItemIdList))
 			.thenReturn(itemList);
 	}
 
@@ -38,12 +38,12 @@ class LimitedProductServiceV1Test {
 
 	private void 상품_조회_결과를_검증한다(GetPurchaseAmountLimitResponseV1 response) {
 		assertionFields(response);
-		verify(limitedProductItemRepository, times(1))
+		verify(productItemRepository, times(1))
 			.findAllById(correctItemIdList);
 	}
 
 	private void 잘못된_상품_아이디가_주어지면_에러가_발생한다() {
-		when(limitedProductItemRepository.findAllById(wrongUUIDItemIdList))
+		when(productItemRepository.findAllById(wrongUUIDItemIdList))
 			.thenThrow(
 				AppException.of(
 					LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getStatus(),
@@ -56,7 +56,7 @@ class LimitedProductServiceV1Test {
 		assertThatThrownBy(() -> limitedProductServiceV1.getPurchaseAmountLimits(wrongUUIDRequest))
 			.isInstanceOf(AppException.class)
 			.hasMessageContaining(LimitedProductErrorCode.PRODUCT_ITEM_NOT_FOUND.getMessage());
-		verify(limitedProductItemRepository, times(1)).findAllById(wrongUUIDItemIdList);
+		verify(productItemRepository, times(1)).findAllById(wrongUUIDItemIdList);
 	}
 
 	@Nested

@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.limito.limitedproduct.domain.vo.OptionStatus;
+import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,4 +59,10 @@ public class ProductOption {
 
 	@OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProductItem> itemList;
+
+	public void validateProductOptionOpened() {
+		if (status != OptionStatus.OPEN) {
+			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_NOT_OPENED);
+		}
+	}
 }
