@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.infrastructure.persistence.repository;
+package com.limito.limitedproduct.infrastructure.persistence.repository.productoption;
 
 import java.util.List;
 import java.util.UUID;
