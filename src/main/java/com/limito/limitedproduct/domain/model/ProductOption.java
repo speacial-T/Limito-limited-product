@@ -57,6 +57,9 @@ public class ProductOption {
 	@Column(name = "sold_out", nullable = false)
 	private boolean isSoldOut = false;
 
+	@Column(name = "minumum_price", nullable = false)
+	private int minimumPrice;
+
 	@Column(name = "limited_product_id", nullable = false, updatable = false)
 	private UUID productId;
 
@@ -103,6 +106,7 @@ public class ProductOption {
 			productItem.attachProductOption(this);
 		}
 		checkAllSoldOut();
+		updateMinimumPrice();
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
@@ -126,5 +130,13 @@ public class ProductOption {
 			}
 			this.isSoldOut = true;
 		}
+	}
+
+	private void updateMinimumPrice() {
+		int min = 0;
+		for (ProductItem productItem : itemList) {
+			min = Integer.min(min, productItem.getPrice());
+		}
+		this.minimumPrice = min;
 	}
 }

@@ -62,6 +62,7 @@ public class LimitedProductMapper {
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
 					.soldOut(productOption.isSoldOut())
+					.minimumPrice(productOption.getMinimumPrice())
 					.build()
 			)
 			.productItems(
@@ -94,6 +95,7 @@ public class LimitedProductMapper {
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
 					.soldOut(productOption.isSoldOut())
+					.minimumPrice(productOption.getMinimumPrice())
 					.build()
 			)
 			.productItems(
