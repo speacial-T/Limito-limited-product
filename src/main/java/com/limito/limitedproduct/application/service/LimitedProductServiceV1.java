@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.application.mapper.LimitedProductMapper;
+import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
@@ -22,13 +23,14 @@ import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
 import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProductRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
@@ -94,9 +96,9 @@ public class LimitedProductServiceV1 {
 	}
 
 	public void reserveStock(ReserveStockRequestV1 request) {
-		List<ReserveStockItemRequest> reserveStockItemRequestList = request.items();
-		List<UUID> requestItemIdList = reserveStockItemRequestList.stream()
-			.map(ReserveStockItemRequest::limitedProductItemId)
+		List<ItemAmountRequest> itemAmountRequestList = request.items();
+		List<UUID> requestItemIdList = itemAmountRequestList.stream()
+			.map(ItemAmountRequest::limitedProductItemId)
 			.toList();
 
 		validateDuplicateId(requestItemIdList);
@@ -108,21 +110,34 @@ public class LimitedProductServiceV1 {
 
 		Map<UUID, ProductItem> productItemMap = productItemList.stream()
 			.collect(Collectors.toMap(ProductItem::getId, Function.identity()));
-		validatePurchaseAmountLimit(productItemMap, reserveStockItemRequestList);
+		validatePurchaseAmountLimit(productItemMap, itemAmountRequestList);
 
-		List<ReserveStockItemRequest> reservedItemList = new ArrayList<>();
+		List<ItemAmountRequest> reservedItemList = new ArrayList<>();
 		try {
-			for (ReserveStockItemRequest reserveStockItemRequest : reserveStockItemRequestList) {
-				productCacheRepository.reserve(reserveStockItemRequest.limitedProductItemId(),
-					reserveStockItemRequest.amount());
-				reservedItemList.add(reserveStockItemRequest);
+			for (ItemAmountRequest itemAmountRequest : itemAmountRequestList) {
+				productCacheRepository.reserve(itemAmountRequest.limitedProductItemId(),
+					itemAmountRequest.amount());
+				reservedItemList.add(itemAmountRequest);
 			}
 		} catch (Exception e) {
-			for (ReserveStockItemRequest reservedItem : reservedItemList) {
+			for (ItemAmountRequest reservedItem : reservedItemList) {
 				productCacheRepository.cancelReservation(reservedItem.limitedProductItemId(), reservedItem.amount());
 			}
 			throw e;
 		}
+	}
+
+	public void cancelReserveStock(CancelReserveStockRequestV1 request) {
+		ItemAmounts itemAmounts = LimitedProductMapper.toItemAmounts(request);
+
+		itemAmounts.validateDuplicateId(
+			request.items()
+				.stream()
+				.map(ItemAmountRequest::limitedProductItemId)
+				.toList()
+		);
+
+		productCacheRepository.cancelReservations(itemAmounts);
 	}
 
 	@Transactional
@@ -185,11 +200,11 @@ public class LimitedProductServiceV1 {
 
 	private void validatePurchaseAmountLimit(
 		Map<UUID, ProductItem> productItemList,
-		List<ReserveStockItemRequest> itemAmountList
+		List<ItemAmountRequest> itemAmountList
 	) {
-		for (ReserveStockItemRequest reserveStockItemRequest : itemAmountList) {
-			ProductItem productItem = productItemList.get(reserveStockItemRequest.limitedProductItemId());
-			productItem.validatePurchaseAmountLimit(reserveStockItemRequest.amount());
+		for (ItemAmountRequest itemAmountRequest : itemAmountList) {
+			ProductItem productItem = productItemList.get(itemAmountRequest.limitedProductItemId());
+			productItem.validatePurchaseAmountLimit(itemAmountRequest.amount());
 		}
 	}
 }

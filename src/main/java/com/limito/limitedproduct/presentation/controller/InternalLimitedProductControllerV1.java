@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
+import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
@@ -34,6 +35,13 @@ public class InternalLimitedProductControllerV1 {
 	@PostMapping("/stock/reserve")
 	public ResponseEntity<Void> reserveStock(@Valid @RequestBody ReserveStockRequestV1 request) {
 		limitedProductServiceV1.reserveStock(request);
+
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/stock/reserve/cancel")
+	public ResponseEntity<Void> cancelReserveStock(@Valid @RequestBody CancelReserveStockRequestV1 request) {
+		limitedProductServiceV1.cancelReserveStock(request);
 
 		return ResponseEntity.ok().build();
 	}

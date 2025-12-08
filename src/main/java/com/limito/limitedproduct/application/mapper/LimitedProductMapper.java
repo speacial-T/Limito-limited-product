@@ -1,12 +1,17 @@
 package com.limito.limitedproduct.application.mapper;
 
+import java.util.HashSet;
 import java.util.List;
 
+import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.vo.ItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
+import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
@@ -42,6 +47,24 @@ public class LimitedProductMapper {
 			.price(productItemRequestInfo.price())
 			.stock(productItemRequestInfo.stock())
 			.purchaseAmountLimit(productItemRequestInfo.purchaseAmountLimit())
+			.build();
+	}
+
+	public static ItemAmounts toItemAmounts(CancelReserveStockRequestV1 cancelReserveStockRequestV1) {
+		return ItemAmounts.builder()
+			.itemAmounts(new HashSet<>(
+				cancelReserveStockRequestV1.items()
+					.stream()
+					.map(LimitedProductMapper::toItemAmount)
+					.toList()
+			))
+			.build();
+	}
+
+	public static ItemAmount toItemAmount(ItemAmountRequest itemAmountRequest) {
+		return ItemAmount.builder()
+			.itemId(itemAmountRequest.limitedProductItemId())
+			.amount(itemAmountRequest.amount())
 			.build();
 	}
 
