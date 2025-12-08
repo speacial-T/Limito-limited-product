@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class CreateProductResponseV1 {
+public class GetProductOptionResponseV1 {
 
 	private ProductResponseInfo productInfo;
 	private ProductOptionResponseInfo productOptionInfo;

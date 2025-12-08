@@ -30,6 +30,7 @@ import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.R
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,13 @@ public class LimitedProductServiceV1 {
 		savedProductOption.initStatus();
 
 		return LimitedProductMapper.toCreateProductResponse(product, savedProductOption);
+	}
+
+	public GetProductOptionResponseV1 getProductOption(UUID limitedProductOptionId) {
+		ProductOption productOption = productOptionRepository.findByIdOrElseThrow(limitedProductOptionId);
+		Product product = productRepository.findByIdOrElseThrow(productOption.getProductId());
+
+		return LimitedProductMapper.toGetProductOptionResponse(product, productOption);
 	}
 
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(

@@ -1,0 +1,3 @@
+# GET - 한정판매 상품 단건 조회(성공)
+@limitedProductOptionId = 96fe5c47-94c4-4bea-b26f-b3e42329ffe1
+GET http://localhost:19094/api/v1/limited-products/{{limitedProductOptionId}}
