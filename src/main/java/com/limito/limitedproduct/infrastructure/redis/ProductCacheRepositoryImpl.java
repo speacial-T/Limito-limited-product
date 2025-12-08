@@ -7,8 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
-import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
+import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.infrastructure.persistence.repository.ProductItemJpaRepository;

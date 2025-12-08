@@ -1,14 +1,14 @@
-package com.limito.limitedproduct.domain.model;
+package com.limito.limitedproduct.domain.vo;
 
 import java.util.UUID;
 
-import org.hibernate.annotations.ColumnDefault;
-
+import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,40 +23,55 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "p_limited_product_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Getter
 public class ProductItem {
 
-	@Getter
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "limited_product_item_id", nullable = false, updatable = false)
 	private UUID id;
 
 	@Column(name = "size", nullable = false, length = 10)
-	@ColumnDefault("'one size'")
-	private String size;
+	private String size = "one size";
 
 	@Column(name = "price", nullable = false)
 	private int price;
 
-	@Getter
 	@Column(name = "stock", nullable = false)
-	@ColumnDefault("0")
-	private int stock;
+	private int stock = 0;
 
 	@Column(name = "sold_out", nullable = false)
-	@ColumnDefault("FALSE")
-	private boolean isSoldOut;
+	private boolean isSoldOut = false;
 
-	@Getter
 	@Column(name = "purchase_amount_limit", nullable = false)
-	@ColumnDefault("2147483647")
-	private int purchaseAmountLimit;
+	private int purchaseAmountLimit = Integer.MAX_VALUE;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "limited_product_option_id", nullable = false, updatable = false)
 	private ProductOption productOption;
+
+	@Builder
+	private ProductItem(
+		String size,
+		int price,
+		Integer stock,
+		Integer purchaseAmountLimit
+	) {
+		this.price = price;
+		this.isSoldOut = (stock == null || stock == 0);
+
+		if (size != null && !size.isEmpty()) {
+			this.size = size;
+		}
+
+		if (stock != null) {
+			this.stock = stock;
+		}
+
+		if (purchaseAmountLimit != null) {
+			this.purchaseAmountLimit = purchaseAmountLimit;
+		}
+	}
 
 	public void validateProductOptionOpened() {
 		productOption.validateProductOptionOpened();
@@ -74,6 +88,10 @@ public class ProductItem {
 			throw LimitedProductInternalException.of(
 				LimitedProductInternalErrorCode.PRODUCT_ITEM_OVER_PURCHASE_AMOUNT_LIMIT);
 		}
+	}
+
+	public void attachProductOption(ProductOption productOption) {
+		this.productOption = productOption;
 	}
 
 	public void soldOut() {

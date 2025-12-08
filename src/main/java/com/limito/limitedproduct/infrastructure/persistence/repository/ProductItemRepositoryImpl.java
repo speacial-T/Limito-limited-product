@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 import com.limito.common.exception.AppException;
-import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
+import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
 
 import lombok.RequiredArgsConstructor;
