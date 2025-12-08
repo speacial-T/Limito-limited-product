@@ -1,4 +1,6 @@
-package com.limito.limitedproduct.domain.mapper;
+package com.limito.limitedproduct.global.mapper;
+
+import java.util.List;
 
 import java.util.UUID;
 
@@ -14,6 +16,11 @@ import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductItemResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductOptionResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
@@ -44,6 +51,22 @@ public class LimitedProductMapper {
 			.price(productItemRequestInfo.price())
 			.stock(productItemRequestInfo.stock())
 			.purchaseAmountLimit(productItemRequestInfo.purchaseAmountLimit())
+			.build();
+	}
+
+	public static GetPurchaseAmountLimitResponseV1 toGetPurchaseAmountLimitResponse(List<ProductItem> productItemList) {
+		return GetPurchaseAmountLimitResponseV1.builder()
+			.items(productItemList.stream()
+				.map(LimitedProductMapper::toPurchaseAmountLimit)
+				.toList()
+			)
+			.build();
+	}
+
+	public static PurchaseAmountLimit toPurchaseAmountLimit(ProductItem productItem) {
+		return PurchaseAmountLimit.builder()
+			.limitedProductItemId(productItem.getId())
+			.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
 			.build();
 	}
 

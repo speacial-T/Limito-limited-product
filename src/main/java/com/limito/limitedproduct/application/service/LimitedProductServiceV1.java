@@ -14,7 +14,6 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.limito.limitedproduct.domain.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
@@ -25,6 +24,7 @@ import com.limito.limitedproduct.domain.repository.ProductRepository;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
+import com.limito.limitedproduct.global.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
@@ -105,7 +105,7 @@ public class LimitedProductServiceV1 {
 		List<ProductItem> productItemList = productItemRepository.findAllById(
 			getPurchaseAmountLimitRequestV1.itemIdList().stream().toList());
 
-		return GetPurchaseAmountLimitResponseV1.of(productItemList);
+		return LimitedProductMapper.toGetPurchaseAmountLimitResponse(productItemList);
 	}
 
 	public void reserveStock(ReserveStockRequestV1 request) {
