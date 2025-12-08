@@ -57,7 +57,7 @@ public class ProductOption {
 	@Column(name = "sold_out", nullable = false)
 	private boolean isSoldOut = false;
 
-	@Column(name = "minumum_price", nullable = false)
+	@Column(name = "minimum_price", nullable = false)
 	private int minimumPrice;
 
 	@Column(name = "limited_product_id", nullable = false, updatable = false)
