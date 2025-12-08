@@ -133,7 +133,7 @@ public class ProductOption {
 	}
 
 	private void updateMinimumPrice() {
-		int min = 0;
+		int min = Integer.MAX_VALUE;
 		for (ProductItem productItem : itemList) {
 			min = Integer.min(min, productItem.getPrice());
 		}
