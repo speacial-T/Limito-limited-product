@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.vo.OptionStatus;
 import com.limito.limitedproduct.domain.vo.ProductItem;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

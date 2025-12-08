@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.global.exception;
+package com.limito.limitedproduct.application.exception;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.limito.limitedproduct.global.response.LimitedProductErrorResponse;
+import com.limito.limitedproduct.application.response.LimitedProductErrorResponse;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,19 +1,19 @@
-package com.limito.limitedproduct.global.mapper;
+package com.limito.limitedproduct.application.mapper;
 
 import java.util.List;
 
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.vo.ProductItem;
-import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
-import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
-import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
+import com.limito.limitedproduct.presentation.dto.response.ProductItemResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.ProductOptionResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.ProductResponseInfo;
 
 public class LimitedProductMapper {
 
