@@ -1,5 +1,7 @@
 package com.limito.limitedproduct.infrastructure.persistence.repository;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -35,5 +37,10 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
 	public ProductOption findByIdOrElseThrow(UUID limitedProductOptionId) {
 		return productOptionJpaRepository.findById(limitedProductOptionId).orElseThrow(() ->
 			AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_WRONG_UUID));
+	}
+
+	@Override
+	public List<ProductOption> findAllByIds(Set<UUID> optionIdList) {
+		return productOptionJpaRepository.findAllById(optionIdList);
 	}
 }

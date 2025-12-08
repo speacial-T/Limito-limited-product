@@ -102,6 +102,7 @@ public class ProductOption {
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
+		// TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(productItemId)) {
 				productItem.soldOut();
@@ -109,5 +110,21 @@ public class ProductOption {
 			}
 		}
 		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+	}
+
+	public void rollbackStockIfMatches(UUID optionId, UUID itemId, int amount) {
+		if (id.equals(optionId)) {
+			rollbackStock(itemId, amount);
+		}
+	}
+
+	private void rollbackStock(UUID itemId, int amount) {
+		// TODO: refactor - for-if
+		for (ProductItem productItem : itemList) {
+			if (productItem.getId().equals(itemId)) {
+				productItem.rollbackStock(amount);
+				//TODO: ProductOption - soldout = true면 FALSe로 바꿔야함.
+			}
+		}
 	}
 }

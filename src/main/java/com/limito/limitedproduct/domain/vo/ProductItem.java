@@ -98,4 +98,9 @@ public class ProductItem {
 		isSoldOut = true;
 		stock = 0;
 	}
+
+	public void rollbackStock(int amount) {
+		this.stock += amount;
+		this.isSoldOut = false;
+	}
 }

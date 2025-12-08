@@ -1,15 +1,20 @@
 package com.limito.limitedproduct.global.mapper;
 
+import java.util.HashSet;
 import java.util.List;
 
+import com.limito.limitedproduct.domain.model.OptionItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
+import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
+import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
@@ -42,6 +47,25 @@ public class LimitedProductMapper {
 			.price(productItemRequestInfo.price())
 			.stock(productItemRequestInfo.stock())
 			.purchaseAmountLimit(productItemRequestInfo.purchaseAmountLimit())
+			.build();
+	}
+
+	public static OptionItemAmounts toOptionItemAmounts(RollbackStockRequestV1 rollbackStockRequestV1) {
+		return OptionItemAmounts.builder()
+			.optionItemStocks(new HashSet<>(
+				rollbackStockRequestV1.products()
+					.stream()
+					.map(LimitedProductMapper::toOptionItemAmount)
+					.toList()
+			))
+			.build();
+	}
+
+	public static OptionItemAmount toOptionItemAmount(OptionItemAmountRequest optionItemAmountRequest) {
+		return OptionItemAmount.builder()
+			.optionId(optionItemAmountRequest.limitedProductOptionId())
+			.itemId(optionItemAmountRequest.limitedProductItemId())
+			.amount(optionItemAmountRequest.amount())
 			.build();
 	}
 

@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.limito.limitedproduct.domain.model.OptionItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
+import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
@@ -25,10 +27,11 @@ import com.limito.limitedproduct.global.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProductRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
+import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
@@ -127,16 +130,16 @@ public class LimitedProductServiceV1 {
 
 	@Transactional
 	public void reduceStock(ReduceStockRequestV1 request) {
-		List<ReduceStockProductRequest> reduceStockProductRequestList = request.products();
+		List<OptionItemAmountRequest> reduceStockProductRequestList = request.products();
 		List<UUID> requestItemIdList = reduceStockProductRequestList
 			.stream()
-			.map(ReduceStockProductRequest::limitedProductItemId)
+			.map(OptionItemAmountRequest::limitedProductItemId)
 			.toList();
 		validateDuplicateId(requestItemIdList);
 
-		List<ReduceStockProductRequest> reducedItemList = new ArrayList<>();
+		List<OptionItemAmountRequest> reducedItemList = new ArrayList<>();
 		try {
-			for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
+			for (OptionItemAmountRequest reduceStockProductRequest : reduceStockProductRequestList) {
 				productCacheRepository.reduceStock(
 					reduceStockProductRequest.limitedProductItemId(),
 					reduceStockProductRequest.amount()
@@ -144,7 +147,7 @@ public class LimitedProductServiceV1 {
 				reducedItemList.add(reduceStockProductRequest);
 			}
 		} catch (Exception e) {
-			for (ReduceStockProductRequest reduceStockProductRequest : reducedItemList) {
+			for (OptionItemAmountRequest reduceStockProductRequest : reducedItemList) {
 				productCacheRepository.cancelReduction(
 					reduceStockProductRequest.limitedProductItemId(),
 					reduceStockProductRequest.amount()
@@ -153,12 +156,40 @@ public class LimitedProductServiceV1 {
 			throw e;
 		}
 
-		for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
+		for (OptionItemAmountRequest reduceStockProductRequest : reduceStockProductRequestList) {
 			if (productCacheRepository.checkSoldOut(reduceStockProductRequest.limitedProductItemId())) {
 				productOptionRepository.soldOut(
 					reduceStockProductRequest.limitedProductOptionId(),
 					reduceStockProductRequest.limitedProductItemId()
 				);
+			}
+		}
+	}
+
+	@Transactional
+	public void rollbackStock(RollbackStockRequestV1 request) {
+		OptionItemAmounts optionItemAmounts = LimitedProductMapper.toOptionItemAmounts(request);
+		optionItemAmounts.validateDuplicateId(
+			request.products()
+				.stream()
+				.map(OptionItemAmountRequest::limitedProductItemId)
+				.toList()
+		);
+
+		List<ProductOption> productOptionList
+			= productOptionRepository.findAllByIds(optionItemAmounts.getOptionIdSet());
+		optionItemAmounts.validateOptionId(productOptionList);
+
+		// TODO: refactor - for-if-for(삼중ㅠㅠ)
+		for (OptionItemAmount optionItemAmount : optionItemAmounts.getOptionItemStocks()) {
+			if (productCacheRepository.rollbackStock(optionItemAmount.getItemId(), optionItemAmount.getAmount())) {
+				for (ProductOption productOption : productOptionList) {
+					productOption.rollbackStockIfMatches(
+						optionItemAmount.getOptionId(),
+						optionItemAmount.getItemId(),
+						optionItemAmount.getAmount()
+					);
+				}
 			}
 		}
 	}

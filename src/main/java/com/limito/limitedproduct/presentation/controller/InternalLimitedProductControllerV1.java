@@ -10,6 +10,7 @@ import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import jakarta.validation.Valid;
@@ -41,6 +42,13 @@ public class InternalLimitedProductControllerV1 {
 	@PostMapping("/stock/reduce")
 	public ResponseEntity<Void> reduceStock(@Valid @RequestBody ReduceStockRequestV1 request) {
 		limitedProductServiceV1.reduceStock(request);
+
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/stock/rollback")
+	public ResponseEntity<Void> rollbackStock(@Valid @RequestBody RollbackStockRequestV1 request) {
+		limitedProductServiceV1.rollbackStock(request);
 
 		return ResponseEntity.ok().build();
 	}

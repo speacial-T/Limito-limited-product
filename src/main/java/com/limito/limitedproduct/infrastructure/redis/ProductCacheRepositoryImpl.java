@@ -108,6 +108,13 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 		return getStock(itemId) == 0;
 	}
 
+	@Override
+	public boolean rollbackStock(UUID itemId, int amount) {
+		increaseStock(itemId, amount);
+
+		return getStock(itemId) == amount;
+	}
+
 	private void increaseReservation(UUID itemId, int amount) {
 		hashOps().increment(key(itemId), FIELD_RESERVATION, amount);
 	}
