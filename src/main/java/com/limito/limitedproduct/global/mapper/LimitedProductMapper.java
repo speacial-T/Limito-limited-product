@@ -12,9 +12,6 @@ import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductItemResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductOptionResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1.ProductResponseInfo;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
 
