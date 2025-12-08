@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.springframework.data.web.PagedModel;
 
+import com.limito.limitedproduct.global.dto.response.ProductAndOptionResponse;
+
 import lombok.Builder;
 import lombok.Getter;
 

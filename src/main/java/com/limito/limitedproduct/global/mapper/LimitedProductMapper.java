@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.springframework.data.web.PagedModel;
 
 import com.limito.limitedproduct.domain.model.Product;
+import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.global.dto.response.ProductAndOptionResponse;
 import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
@@ -18,7 +20,6 @@ import com.limito.limitedproduct.presentation.dto.response.GetProductOptionRespo
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
-import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
 public class LimitedProductMapper {
 
@@ -152,6 +153,19 @@ public class LimitedProductMapper {
 			.categoryId(categoryId)
 			.category(category)
 			.data(productAndOptionList)
+			.build();
+	}
+
+	public static ProductAndOptionResponse toProductAndOptionResponse(ProductAndOption productAndOption) {
+		return ProductAndOptionResponse.builder()
+			.name(productAndOption.getName())
+			.brandName(productAndOption.getBrandName())
+			.limitedProductOptionId(productAndOption.getLimitedProductOptionId())
+			.thumbnailUrl(productAndOption.getThumbnailUrl())
+			.color(productAndOption.getColor())
+			.status(productAndOption.getStatus())
+			.soldOut(productAndOption.isSoldOut())
+			.minimumPrice(productAndOption.getMinimumPrice())
 			.build();
 	}
 }

@@ -9,12 +9,14 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.limito.limitedproduct.domain.model.Product;
+import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
@@ -36,7 +38,6 @@ import com.limito.limitedproduct.presentation.dto.response.CreateProductResponse
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
-import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -94,10 +95,14 @@ public class LimitedProductServiceV1 {
 		// TODO: 카테고리 캐싱해와서 정보 가져오기
 		String category = "임시 카테고리명";
 
-		PagedModel<ProductAndOptionResponse> productAndOptionList
+		Page<ProductAndOption> productAndOptionList
 			= productOptionQueryRepository.findOptionsByCategoryId(categoryId, pageable);
 
-		return LimitedProductMapper.toGetProductsByCategoryResponse(categoryId, category, productAndOptionList);
+		return LimitedProductMapper.toGetProductsByCategoryResponse(
+			categoryId,
+			category,
+			new PagedModel<>(productAndOptionList.map(LimitedProductMapper::toProductAndOptionResponse))
+		);
 	}
 
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(

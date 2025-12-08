@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.presentation.dto.response;
+package com.limito.limitedproduct.domain.model;
 
 import java.util.UUID;
 
@@ -7,7 +7,7 @@ import com.limito.limitedproduct.domain.vo.OptionStatus;
 import lombok.Getter;
 
 @Getter
-public class ProductAndOptionResponse {
+public class ProductAndOption {
 	private final String name;
 	private final String brandName;
 	private final UUID limitedProductOptionId;
@@ -17,7 +17,7 @@ public class ProductAndOptionResponse {
 	private final boolean soldOut;
 	private final int minimumPrice;
 
-	public ProductAndOptionResponse(
+	public ProductAndOption(
 		String name,
 		String brandName,
 		UUID limitedProductOptionId,

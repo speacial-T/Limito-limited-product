@@ -8,13 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
-import com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse;
 
 public interface ProductOptionQueryJpaRepository extends JpaRepository<ProductOption, UUID> {
 
 	@Query("""
-		SELECT new com.limito.limitedproduct.presentation.dto.response.ProductAndOptionResponse(
+		SELECT new com.limito.limitedproduct.domain.model.ProductAndOption(
 			p.name,
 			p.brandName,
 			o.id,
@@ -33,7 +33,7 @@ public interface ProductOptionQueryJpaRepository extends JpaRepository<ProductOp
 			o.isSoldOut ASC,
 			o.openAt DESC
 				""")
-	Page<ProductAndOptionResponse> findOptionsByCategoryId(
+	Page<ProductAndOption> findOptionsByCategoryId(
 		@Param("categoryId") UUID categoryId,
 		Pageable pageable
 	);
