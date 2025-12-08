@@ -18,6 +18,10 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
 	private final ProductOptionJpaRepository productOptionJpaRepository;
 
 	@Override
+	public ProductOption save(ProductOption productOption) {
+		return productOptionJpaRepository.save(productOption);
+	}
+
 	public void soldOut(UUID productOptionId, UUID productItemId) {
 		ProductOption productOption = productOptionJpaRepository.findById(productOptionId).orElseThrow(() ->
 			LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_WRONG_UUID));

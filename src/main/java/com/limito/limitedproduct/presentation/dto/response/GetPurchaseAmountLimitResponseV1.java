@@ -3,6 +3,9 @@ package com.limito.limitedproduct.presentation.dto.response;
 import java.util.List;
 import java.util.UUID;
 
+import com.limito.limitedproduct.domain.vo.ProductItem;
+
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,12 +1,11 @@
 package com.limito.limitedproduct.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import com.limito.limitedproduct.domain.vo.OptionStatus;
+import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
@@ -18,14 +17,17 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKey;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_limited_product_options")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ProductOption {
 
 	@Id
@@ -34,33 +36,47 @@ public class ProductOption {
 	private UUID id;
 
 	@Column(name = "model_number", nullable = false, unique = true, length = 50)
-	private String modelNo;
+	private String modelNumber;
 
-	@Column(name = "thumbnail_url", nullable = false, length = 255)
+	@Column(name = "thumbnail_url", nullable = false)
 	private String thumbnailUrl;
 
 	@Column(name = "details", columnDefinition = "TEXT")
 	private String details;
 
 	@Column(name = "color", nullable = false, length = 50)
-	@ColumnDefault("'one color'")
-	private String color;
+	private String color = "one color";
 
 	@Column(name = "open_at", nullable = false, updatable = false)
 	private LocalDateTime openAt;
 
-	@Column(name = "status", nullable = false)
+	@Column(name = "status", nullable = false, length = 10)
 	@Enumerated(EnumType.STRING)
-	@ColumnDefault("'READY'")
-	private OptionStatus status;
+	private OptionStatus status = OptionStatus.READY;
 
-	@ManyToOne
-	@JoinColumn(name = "limited_product_id", nullable = false, updatable = false)
-	private Product product;
+	@Column(name = "limited_product_id", nullable = false, updatable = false)
+	private UUID productId;
 
 	@OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)
-	@MapKey(name = "id")
-	private Map<UUID, ProductItem> itemList;
+	private List<ProductItem> itemList;
+
+	@Builder
+	private ProductOption(
+		String modelNumber,
+		String thumbnailUrl,
+		String details,
+		LocalDateTime openAt,
+		String color
+	) {
+		this.modelNumber = modelNumber;
+		this.thumbnailUrl = thumbnailUrl;
+		this.details = details;
+		this.openAt = openAt;
+
+		if (color != null) {
+			this.color = color;
+		}
+	}
 
 	public void validateProductOptionOpened() {
 		if (status != OptionStatus.OPEN) {
@@ -68,13 +84,30 @@ public class ProductOption {
 		}
 	}
 
-	public void makeItemSoldOut(UUID productItemId) {
-		ProductItem productItem = itemList.get(productItemId);
-
-		if (productItem == null) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+	public void initStatus() {
+		if (!this.openAt.isAfter(LocalDateTime.now())) {
+			this.status = OptionStatus.OPEN;
 		}
+	}
 
-		productItem.soldOut();
+	public void attachProduct(UUID productId) {
+		this.productId = productId;
+	}
+
+	public void attachProductItems(List<ProductItem> productItemList) {
+		itemList = productItemList;
+		for (ProductItem productItem : productItemList) {
+			productItem.attachProductOption(this);
+		}
+	}
+
+	public void makeItemSoldOut(UUID productItemId) {
+		for (ProductItem productItem : itemList) {
+			if (productItem.getId().equals(productItemId)) {
+				productItem.soldOut();
+				return;
+			}
+		}
+		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
 	}
 }

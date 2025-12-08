@@ -13,17 +13,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.limito.limitedproduct.domain.mapper.LimitedProductMapper;
+import com.limito.limitedproduct.domain.model.Product;
+import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.ProductItem;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
+import com.limito.limitedproduct.domain.repository.ProductRepository;
+import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
 import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
+import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProductRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1.ReserveStockItemRequest;
+import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import lombok.RequiredArgsConstructor;
@@ -32,9 +40,40 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LimitedProductServiceV1 {
 
+	private final ProductRepository productRepository;
 	private final ProductOptionRepository productOptionRepository;
 	private final ProductItemRepository productItemRepository;
 	private final ProductCacheRepository productCacheRepository;
+
+	@Transactional
+	public CreateProductResponseV1 createProduct(Long userId, CreateProductRequestV1 request) {
+		ProductRequestInfo productRequestInfo = request.product();
+		ProductOption newProductOption = LimitedProductMapper.toProductOption(productRequestInfo);
+
+		Product product = productRepository.findByNameAndSellerIdOrElseGetNull(productRequestInfo.name(), userId);
+
+		// TODO: refactor - if/else
+		if (product != null) {
+			product.validateCategoryId(productRequestInfo.categoryId());
+			product.validateBrandName(productRequestInfo.brandName());
+		} else {
+			Product newProduct = LimitedProductMapper.toProduct(userId, productRequestInfo);
+			product = productRepository.save(newProduct);
+		}
+
+		newProductOption.attachProduct(product.getId());
+
+		List<ProductItem> newProductItemList = request.productItems()
+			.stream()
+			.map(LimitedProductMapper::toProductItem)
+			.toList();
+		newProductOption.attachProductItems(newProductItemList);
+
+		ProductOption savedProductOption = productOptionRepository.save(newProductOption);
+		savedProductOption.initStatus();
+
+		return LimitedProductMapper.toCreateProductResponse(product, savedProductOption);
+	}
 
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(
 		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1
@@ -140,9 +179,9 @@ public class LimitedProductServiceV1 {
 
 	private void validatePurchaseAmountLimit(
 		Map<UUID, ProductItem> productItemList,
-		List<ReserveStockItemRequest> reserveStockItemRequestList
+		List<ReserveStockItemRequest> itemAmountList
 	) {
-		for (ReserveStockItemRequest reserveStockItemRequest : reserveStockItemRequestList) {
+		for (ReserveStockItemRequest reserveStockItemRequest : itemAmountList) {
 			ProductItem productItem = productItemList.get(reserveStockItemRequest.limitedProductItemId());
 			productItem.validatePurchaseAmountLimit(reserveStockItemRequest.amount());
 		}
