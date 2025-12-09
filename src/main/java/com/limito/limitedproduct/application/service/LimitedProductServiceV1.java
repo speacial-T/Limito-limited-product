@@ -135,8 +135,7 @@ public class LimitedProductServiceV1 {
 		List<ItemAmountRequest> reservedItemList = new ArrayList<>();
 		try {
 			for (ItemAmountRequest itemAmountRequest : itemAmountRequestList) {
-				productCacheRepository.reserve(itemAmountRequest.limitedProductItemId(),
-					itemAmountRequest.amount());
+				productCacheRepository.reserve(itemAmountRequest.limitedProductItemId(), itemAmountRequest.amount());
 				reservedItemList.add(itemAmountRequest);
 			}
 		} catch (Exception e) {
