@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.global.dto.response;
+package com.limito.limitedproduct.presentation.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

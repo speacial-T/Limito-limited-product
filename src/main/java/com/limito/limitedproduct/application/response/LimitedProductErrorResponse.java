@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.global.response;
+package com.limito.limitedproduct.application.response;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

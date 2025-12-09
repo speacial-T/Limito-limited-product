@@ -1,0 +1,12 @@
+# POST UPDATE - 주문 수량 예약 취소(성공)
+POST http://localhost:19094/internal/v1/limited-products/stock/reserve/cancel
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "limitedProductItemId": "40000000-0000-0000-0000-000000000003",
+      "amount": 2
+    }
+  ]
+}

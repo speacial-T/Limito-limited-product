@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.global.exception;
+package com.limito.limitedproduct.application.exception;
 
 import org.springframework.http.HttpStatus;
 

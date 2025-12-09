@@ -2,6 +2,8 @@ package com.limito.limitedproduct.domain.repository;
 
 import java.util.UUID;
 
+import com.limito.limitedproduct.domain.model.ItemAmounts;
+
 public interface ProductCacheRepository {
 
 	int getStock(UUID itemId);
@@ -9,6 +11,8 @@ public interface ProductCacheRepository {
 	int getReservation(UUID itemId);
 
 	void reserve(UUID itemId, int amount);
+
+	void cancelReservations(ItemAmounts itemAmounts);
 
 	void cancelReservation(UUID itemId, int amount);
 
