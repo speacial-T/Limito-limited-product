@@ -1,10 +1,15 @@
 package com.limito.limitedproduct.global.mapper;
 
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.web.PagedModel;
 
 import com.limito.limitedproduct.domain.model.Product;
+import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.global.dto.response.ProductAndOptionResponse;
 import com.limito.limitedproduct.global.dto.response.ProductItemResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductOptionResponseInfo;
 import com.limito.limitedproduct.global.dto.response.ProductResponseInfo;
@@ -12,6 +17,7 @@ import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
 
@@ -81,6 +87,8 @@ public class LimitedProductMapper {
 					.color(productOption.getColor())
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
+					.soldOut(productOption.isSoldOut())
+					.minimumPrice(productOption.getMinimumPrice())
 					.build()
 			)
 			.productItems(
@@ -112,6 +120,8 @@ public class LimitedProductMapper {
 					.color(productOption.getColor())
 					.openAt(productOption.getOpenAt())
 					.status(productOption.getStatus().name())
+					.soldOut(productOption.isSoldOut())
+					.minimumPrice(productOption.getMinimumPrice())
 					.build()
 			)
 			.productItems(
@@ -131,6 +141,31 @@ public class LimitedProductMapper {
 			.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
 			.stock(productItem.getStock())
 			.soldOut(productItem.isSoldOut())
+			.build();
+	}
+
+	public static GetProductsByCategoryResponseV1 toGetProductsByCategoryResponse(
+		UUID categoryId,
+		String category,
+		PagedModel<ProductAndOptionResponse> productAndOptionList
+	) {
+		return GetProductsByCategoryResponseV1.builder()
+			.categoryId(categoryId)
+			.category(category)
+			.data(productAndOptionList)
+			.build();
+	}
+
+	public static ProductAndOptionResponse toProductAndOptionResponse(ProductAndOption productAndOption) {
+		return ProductAndOptionResponse.builder()
+			.name(productAndOption.getName())
+			.brandName(productAndOption.getBrandName())
+			.limitedProductOptionId(productAndOption.getLimitedProductOptionId())
+			.thumbnailUrl(productAndOption.getThumbnailUrl())
+			.color(productAndOption.getColor())
+			.status(productAndOption.getStatus())
+			.soldOut(productAndOption.isSoldOut())
+			.minimumPrice(productAndOption.getMinimumPrice())
 			.build();
 	}
 }
