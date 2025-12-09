@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.vo.OptionItemAmount;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import lombok.Builder;
 import lombok.Getter;
