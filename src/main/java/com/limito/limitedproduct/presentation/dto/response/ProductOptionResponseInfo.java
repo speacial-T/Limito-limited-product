@@ -16,4 +16,6 @@ public class ProductOptionResponseInfo {
 	private String color;
 	private LocalDateTime openAt;
 	private String status;
+	private boolean soldOut;
+	private int minimumPrice;
 }

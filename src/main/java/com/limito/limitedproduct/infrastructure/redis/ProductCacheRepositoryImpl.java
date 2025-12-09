@@ -14,6 +14,9 @@ import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.vo.ItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.infrastructure.persistence.repository.ProductItemJpaRepository;
+import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
+import com.limito.limitedproduct.infrastructure.persistence.repository.productoption.ProductItemJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
