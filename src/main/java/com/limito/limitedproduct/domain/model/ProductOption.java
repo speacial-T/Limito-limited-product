@@ -110,7 +110,7 @@ public class ProductOption {
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
-		//TODO: for-if 개선 필요
+		//TODO: refactor - for-if
 		// TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(productItemId)) {
@@ -123,7 +123,7 @@ public class ProductOption {
 	}
 
 	private void checkAllSoldOut() {
-		//TODO: for-if 개선 필요
+		//TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (!productItem.isSoldOut()) {
 				this.isSoldOut = false;
@@ -152,8 +152,14 @@ public class ProductOption {
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(itemId)) {
 				productItem.rollbackStock(amount);
-				//TODO: ProductOption - soldout = true면 FALSe로 바꿔야함.
+				changeIsSoldOutToFalse();
 			}
+		}
+	}
+
+	private void changeIsSoldOutToFalse() {
+		if (isSoldOut) {
+			isSoldOut = false;
 		}
 	}
 }
