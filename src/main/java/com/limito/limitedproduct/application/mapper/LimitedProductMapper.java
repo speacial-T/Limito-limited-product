@@ -11,16 +11,16 @@ import com.limito.limitedproduct.domain.model.OptionItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
-import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 import com.limito.limitedproduct.domain.vo.ItemAmount;
+import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.global.dto.response.ProductAndOptionResponse;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
+import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
@@ -62,7 +62,7 @@ public class LimitedProductMapper {
 
 	public static OptionItemAmounts toOptionItemAmounts(RollbackStockRequestV1 rollbackStockRequestV1) {
 		return OptionItemAmounts.builder()
-			.optionItemStocks(new HashSet<>(
+			.optionItemAmounts(new HashSet<>(
 				rollbackStockRequestV1.products()
 					.stream()
 					.map(LimitedProductMapper::toOptionItemAmount)

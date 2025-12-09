@@ -213,7 +213,7 @@ public class LimitedProductServiceV1 {
 		optionItemAmounts.validateOptionId(productOptionList);
 
 		// TODO: refactor - for-if-for(삼중ㅠㅠ)
-		for (OptionItemAmount optionItemAmount : optionItemAmounts.getOptionItemStocks()) {
+		for (OptionItemAmount optionItemAmount : optionItemAmounts.getOptionItemAmounts()) {
 			if (productCacheRepository.rollbackStock(optionItemAmount.getItemId(), optionItemAmount.getAmount())) {
 				for (ProductOption productOption : productOptionList) {
 					productOption.rollbackStockIfMatches(

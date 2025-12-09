@@ -16,17 +16,17 @@ import lombok.Getter;
 @Getter
 public class OptionItemAmounts {
 
-	private Set<OptionItemAmount> optionItemStocks;
+	private Set<OptionItemAmount> optionItemAmounts;
 
 	public void validateDuplicateId(List<UUID> idList) {
-		if (optionItemStocks.size() != idList.size()) {
+		if (optionItemAmounts.size() != idList.size()) {
 			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
 		}
 	}
 
 	public Set<UUID> getOptionIdSet() {
 		return new HashSet<>(
-			optionItemStocks.stream()
+			optionItemAmounts.stream()
 				.map(OptionItemAmount::getOptionId)
 				.toList()
 		);
