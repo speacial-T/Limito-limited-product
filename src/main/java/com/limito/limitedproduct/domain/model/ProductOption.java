@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.vo.OptionStatus;
 import com.limito.limitedproduct.domain.vo.ProductItem;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -54,6 +54,12 @@ public class ProductOption {
 	@Enumerated(EnumType.STRING)
 	private OptionStatus status = OptionStatus.READY;
 
+	@Column(name = "sold_out", nullable = false)
+	private boolean isSoldOut = false;
+
+	@Column(name = "minimum_price", nullable = false)
+	private int minimumPrice;
+
 	@Column(name = "limited_product_id", nullable = false, updatable = false)
 	private UUID productId;
 
@@ -99,17 +105,40 @@ public class ProductOption {
 		for (ProductItem productItem : productItemList) {
 			productItem.attachProductOption(this);
 		}
+		checkAllSoldOut();
+		updateMinimumPrice();
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
+		//TODO: for-if 개선 필요
 		// TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(productItemId)) {
 				productItem.soldOut();
+				checkAllSoldOut();
 				return;
 			}
 		}
 		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+	}
+
+	private void checkAllSoldOut() {
+		//TODO: for-if 개선 필요
+		for (ProductItem productItem : itemList) {
+			if (!productItem.isSoldOut()) {
+				this.isSoldOut = false;
+				return;
+			}
+			this.isSoldOut = true;
+		}
+	}
+
+	private void updateMinimumPrice() {
+		int min = Integer.MAX_VALUE;
+		for (ProductItem productItem : itemList) {
+			min = Integer.min(min, productItem.getPrice());
+		}
+		this.minimumPrice = min;
 	}
 
 	public void rollbackStockIfMatches(UUID optionId, UUID itemId, int amount) {

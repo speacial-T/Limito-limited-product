@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.limito.common.exception.AppException;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
-import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 @DisplayName("Service:LimitedProduct")

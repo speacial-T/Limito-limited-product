@@ -7,11 +7,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
+import com.limito.limitedproduct.domain.vo.ItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
-import com.limito.limitedproduct.infrastructure.persistence.repository.ProductItemJpaRepository;
+import com.limito.limitedproduct.infrastructure.persistence.repository.productoption.ProductItemJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -77,6 +79,14 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 	}
 
 	@Override
+	public void cancelReservations(ItemAmounts itemAmounts) {
+		//TODO: refactor - getter
+		for (ItemAmount itemAmount : itemAmounts.getItemAmounts()) {
+			cancelReservation(itemAmount);
+		}
+	}
+
+	@Override
 	public void cancelReservation(UUID itemId, int amount) {
 		decreaseReservation(itemId, amount);
 	}
@@ -129,5 +139,10 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 	private void decreaseStock(UUID itemId, int amount) {
 		hashOps().increment(key(itemId), FIELD_STOCK, -amount);
+	}
+
+	private void cancelReservation(ItemAmount itemAmount) {
+		//TODO: refactor - getter
+		decreaseReservation(itemAmount.getItemId(), itemAmount.getAmount());
 	}
 }

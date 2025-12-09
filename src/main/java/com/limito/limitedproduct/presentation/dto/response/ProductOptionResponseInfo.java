@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.global.dto.response;
+package com.limito.limitedproduct.presentation.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,4 +16,6 @@ public class ProductOptionResponseInfo {
 	private String color;
 	private LocalDateTime openAt;
 	private String status;
+	private boolean soldOut;
+	private int minimumPrice;
 }

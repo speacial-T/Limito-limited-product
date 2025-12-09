@@ -1,4 +1,4 @@
-package com.limito.limitedproduct.infrastructure.persistence.repository;
+package com.limito.limitedproduct.infrastructure.persistence.repository.productoption;
 
 import java.util.List;
 import java.util.Set;
@@ -7,11 +7,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
-import com.limito.limitedproduct.global.exception.LimitedProductErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import lombok.RequiredArgsConstructor;
 

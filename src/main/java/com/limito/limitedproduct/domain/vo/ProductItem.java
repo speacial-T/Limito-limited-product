@@ -2,9 +2,9 @@ package com.limito.limitedproduct.domain.vo;
 
 import java.util.UUID;
 
+import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
+import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.model.ProductOption;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.global.exception.LimitedProductInternalException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
