@@ -19,6 +19,7 @@ import com.limito.limitedproduct.application.exception.LimitedProductInternalErr
 import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.application.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.ItemAmounts;
+import com.limito.limitedproduct.domain.model.OptionItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductAndOption;
 import com.limito.limitedproduct.domain.model.ProductOption;
@@ -27,15 +28,17 @@ import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionQueryRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
+import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
+import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1.ReduceStockProductRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
@@ -161,31 +164,64 @@ public class LimitedProductServiceV1 {
 
 	@Transactional
 	public void reduceStock(ReduceStockRequestV1 request) {
-		List<ReduceStockProductRequest> reduceStockProductRequestList = request.products();
-		List<UUID> requestItemIdList = reduceStockProductRequestList.stream()
-			.map(ReduceStockProductRequest::limitedProductItemId)
+		List<OptionItemAmountRequest> reduceStockProductRequestList = request.products();
+		List<UUID> requestItemIdList = reduceStockProductRequestList
+			.stream()
+			.map(OptionItemAmountRequest::limitedProductItemId)
 			.toList();
 		validateDuplicateId(requestItemIdList);
 
-		List<ReduceStockProductRequest> reducedItemList = new ArrayList<>();
+		List<OptionItemAmountRequest> reducedItemList = new ArrayList<>();
 		try {
-			for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
-				productCacheRepository.reduceStock(reduceStockProductRequest.limitedProductItemId(),
-					reduceStockProductRequest.amount());
+			for (OptionItemAmountRequest reduceStockProductRequest : reduceStockProductRequestList) {
+				productCacheRepository.reduceStock(
+					reduceStockProductRequest.limitedProductItemId(),
+					reduceStockProductRequest.amount()
+				);
 				reducedItemList.add(reduceStockProductRequest);
 			}
 		} catch (Exception e) {
-			for (ReduceStockProductRequest reduceStockProductRequest : reducedItemList) {
-				productCacheRepository.cancelReduction(reduceStockProductRequest.limitedProductItemId(),
-					reduceStockProductRequest.amount());
+			for (OptionItemAmountRequest reduceStockProductRequest : reducedItemList) {
+				productCacheRepository.cancelReduction(
+					reduceStockProductRequest.limitedProductItemId(),
+					reduceStockProductRequest.amount()
+				);
 			}
 			throw e;
 		}
 
-		for (ReduceStockProductRequest reduceStockProductRequest : reduceStockProductRequestList) {
+		for (OptionItemAmountRequest reduceStockProductRequest : reduceStockProductRequestList) {
 			if (productCacheRepository.checkSoldOut(reduceStockProductRequest.limitedProductItemId())) {
 				productOptionRepository.soldOut(reduceStockProductRequest.limitedProductOptionId(),
 					reduceStockProductRequest.limitedProductItemId());
+			}
+		}
+	}
+
+	@Transactional
+	public void rollbackStock(RollbackStockRequestV1 request) {
+		OptionItemAmounts optionItemAmounts = LimitedProductMapper.toOptionItemAmounts(request);
+		optionItemAmounts.validateDuplicateId(
+			request.products()
+				.stream()
+				.map(OptionItemAmountRequest::limitedProductItemId)
+				.toList()
+		);
+
+		List<ProductOption> productOptionList
+			= productOptionRepository.findAllByIds(optionItemAmounts.getOptionIdSet());
+		optionItemAmounts.validateOptionId(productOptionList);
+
+		// TODO: refactor - for-if-for(삼중ㅠㅠ)
+		for (OptionItemAmount optionItemAmount : optionItemAmounts.getOptionItemAmounts()) {
+			if (productCacheRepository.rollbackStock(optionItemAmount.getItemId(), optionItemAmount.getAmount())) {
+				for (ProductOption productOption : productOptionList) {
+					productOption.rollbackStockIfMatches(
+						optionItemAmount.getOptionId(),
+						optionItemAmount.getItemId(),
+						optionItemAmount.getAmount()
+					);
+				}
 			}
 		}
 	}

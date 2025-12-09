@@ -5,7 +5,10 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record ItemAmountRequest(
+public record OptionItemAmountRequest(
+	@NotNull(message = "옵션 id는 null일 수 없습니다.")
+	UUID limitedProductOptionId,
+
 	@NotNull(message = "아이템 id는 null일 수 없습니다.")
 	UUID limitedProductItemId,
 

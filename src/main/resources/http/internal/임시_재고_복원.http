@@ -1,5 +1,5 @@
-# POST UPDATE - 임시 재고 차감(성공)
-POST http://localhost:19094/internal/v1/limited-products/stock/reduce
+# POST UPDATE - 임시 재고 복원
+POST http://localhost:19094/internal/v1/limited-products/stock/rollback
 Content-Type: application/json
 
 {

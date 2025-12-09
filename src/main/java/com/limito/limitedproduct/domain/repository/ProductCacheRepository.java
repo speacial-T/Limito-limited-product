@@ -21,4 +21,6 @@ public interface ProductCacheRepository {
 	void cancelReduction(UUID itemId, int amount);
 
 	boolean checkSoldOut(UUID itemId);
+
+	boolean rollbackStock(UUID itemId, int amount);
 }

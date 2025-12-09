@@ -110,7 +110,8 @@ public class ProductOption {
 	}
 
 	public void makeItemSoldOut(UUID productItemId) {
-		//TODO: for-if 개선 필요
+		//TODO: refactor - for-if
+		// TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (productItem.getId().equals(productItemId)) {
 				productItem.soldOut();
@@ -122,7 +123,7 @@ public class ProductOption {
 	}
 
 	private void checkAllSoldOut() {
-		//TODO: for-if 개선 필요
+		//TODO: refactor - for-if
 		for (ProductItem productItem : itemList) {
 			if (!productItem.isSoldOut()) {
 				this.isSoldOut = false;
@@ -138,5 +139,27 @@ public class ProductOption {
 			min = Integer.min(min, productItem.getPrice());
 		}
 		this.minimumPrice = min;
+	}
+
+	public void rollbackStockIfMatches(UUID optionId, UUID itemId, int amount) {
+		if (id.equals(optionId)) {
+			rollbackStock(itemId, amount);
+		}
+	}
+
+	private void rollbackStock(UUID itemId, int amount) {
+		// TODO: refactor - for-if
+		for (ProductItem productItem : itemList) {
+			if (productItem.getId().equals(itemId)) {
+				productItem.rollbackStock(amount);
+				changeIsSoldOutToFalse();
+			}
+		}
+	}
+
+	private void changeIsSoldOutToFalse() {
+		if (isSoldOut) {
+			isSoldOut = false;
+		}
 	}
 }
