@@ -13,7 +13,7 @@ public record OptionItemAmountRequest(
 	UUID limitedProductItemId,
 
 	@NotNull(message = "수량은 null일 수 없습니다.")
-	@Positive(message = "최소 구매 수량은 1개입니다.")
+	@Positive(message = "수량은 1 이상이어야 합니다.")
 	int amount
 ) {
 }
