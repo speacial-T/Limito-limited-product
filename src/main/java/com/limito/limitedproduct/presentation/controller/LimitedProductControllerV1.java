@@ -52,14 +52,14 @@ public class LimitedProductControllerV1 {
 			.body(response);
 	}
 
-	@GetMapping("/{limitedProductOptionId}")
+	@GetMapping("/view/{limitedProductOptionId}")
 	public ResponseEntity<GetProductOptionResponseV1> getProductOption(@PathVariable UUID limitedProductOptionId) {
 		GetProductOptionResponseV1 response = limitedProductServiceV1.getProductOption(limitedProductOptionId);
 
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/all")
+	@GetMapping("/view/all")
 	public ResponseEntity<GetProductsByCategoryResponseV1> getProductsByCategory(
 		@RequestParam(name = "categoryId") UUID categoryId,
 		Pageable pageable
