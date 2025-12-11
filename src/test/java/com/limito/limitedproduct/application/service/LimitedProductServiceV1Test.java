@@ -14,8 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.limito.common.exception.AppException;
-import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
+import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 @DisplayName("Service:LimitedProduct")
@@ -44,12 +44,7 @@ class LimitedProductServiceV1Test {
 
 	private void 잘못된_상품_아이디가_주어지면_에러가_발생한다() {
 		when(productItemRepository.findAllById(wrongUUIDItemIdList))
-			.thenThrow(
-				AppException.of(
-					LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getStatus(),
-					LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getMessage()
-				)
-			);
+			.thenThrow(AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID));
 	}
 
 	private void 예상한_예외가_발생했는지_검증한다() {

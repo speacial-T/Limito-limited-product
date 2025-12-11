@@ -7,8 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.vo.ItemAmount;
@@ -37,9 +37,9 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 
 	private Pair<Integer, Integer> initCache(UUID itemId) {
 		String key = key(itemId);
-		ProductItem productItem = productItemJpaRepository.findById(itemId).orElseThrow(() ->
-			LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID)
-		);
+		ProductItem productItem = productItemJpaRepository.findById(itemId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID)
+			);
 
 		hashOps().putIfAbsent(key, FIELD_STOCK, String.valueOf(productItem.getStock()));
 		hashOps().putIfAbsent(key, FIELD_RESERVATION, "0");
@@ -109,7 +109,7 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 		int remainingStock = stock - reservation;
 
 		if (amount > remainingStock) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
 		}
 	}
 
