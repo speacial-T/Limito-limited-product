@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/v1/limited-products")
-public class InternalLimitedProductControllerV1 {
+public class LimitedProductInternalControllerV1 {
 
 	private final LimitedProductServiceV1 limitedProductServiceV1;
 
