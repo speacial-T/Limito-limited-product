@@ -15,8 +15,8 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.application.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.model.OptionItemAmounts;
@@ -230,7 +230,7 @@ public class LimitedProductServiceV1 {
 		Set<UUID> itemIdSet = new HashSet<>(requestItemIdList);
 
 		if (itemIdSet.size() != requestItemIdList.size()) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
 		}
 	}
 
