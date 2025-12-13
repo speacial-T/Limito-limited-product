@@ -1,6 +1,7 @@
 package com.limito.limitedproduct.presentation.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,10 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
+import com.limito.limitedproduct.presentation.dto.request.GetOrderedProductInfoRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
+import com.limito.limitedproduct.presentation.dto.response.GetOrderedProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 
 import jakarta.validation.Valid;
@@ -59,5 +62,14 @@ public class LimitedProductInternalControllerV1 {
 		limitedProductServiceV1.rollbackStock(request);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/ordered-products")
+	public ResponseEntity<GetOrderedProductInfoResponseV1> getOrderedProductInfo(
+		@Valid @RequestBody GetOrderedProductInfoRequestV1 request
+	) {
+		GetOrderedProductInfoResponseV1 response = limitedProductServiceV1.getOrderedProductInfo(request);
+
+		return ResponseEntity.ok(response);
 	}
 }

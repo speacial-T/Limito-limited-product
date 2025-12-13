@@ -22,6 +22,7 @@ import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetOrderedProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
@@ -212,6 +213,29 @@ public class LimitedProductMapper {
 			.status(productAndOption.getStatus())
 			.soldOut(productAndOption.isSoldOut())
 			.minimumPrice(productAndOption.getMinimumPrice())
+			.build();
+	}
+
+	public static GetOrderedProductInfoResponseV1 toGetOrderedProductInfoResponse(
+		List<GetOrderedProductInfoResponseV1.OrderedProductInfo> orderedProductInfoList
+	) {
+		return GetOrderedProductInfoResponseV1.builder()
+			.products(orderedProductInfoList)
+			.build();
+	}
+
+	public static GetOrderedProductInfoResponseV1.OrderedProductInfo toOrderedProductInfo(
+		Product product,
+		ProductOption productOption,
+		ProductItem productItem
+	) {
+		return GetOrderedProductInfoResponseV1.OrderedProductInfo
+			.builder()
+			.name(product.getName())
+			.brandName(product.getBrandName())
+			.sellerId(product.getSellerId())
+			.color(productOption.getColor())
+			.size(productItem.getSize())
 			.build();
 	}
 }

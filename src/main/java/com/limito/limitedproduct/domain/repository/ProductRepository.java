@@ -11,4 +11,6 @@ public interface ProductRepository {
 	Product save(Product newProduct);
 
 	Product findByIdOrElseThrow(UUID productId);
+
+	Product findById(UUID productId);
 }

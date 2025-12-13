@@ -19,7 +19,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	@Override
 	public Product findByNameAndSellerIdOrElseGetNull(String name, Long sellerId) {
-		return productJpaRepository.findByNameAndSellerId(name, sellerId).orElse(null);
+		return productJpaRepository.findByNameAndSellerId(name, sellerId)
+			.orElse(null);
 	}
 
 	@Override
@@ -29,7 +30,13 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	@Override
 	public Product findByIdOrElseThrow(UUID productId) {
-		return productJpaRepository.findById(productId).orElseThrow(() ->
-			AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_UUID));
+		return productJpaRepository.findById(productId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_UUID));
+	}
+
+	@Override
+	public Product findById(UUID productId) {
+		return productJpaRepository.findById(productId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_UUID));
 	}
 }
