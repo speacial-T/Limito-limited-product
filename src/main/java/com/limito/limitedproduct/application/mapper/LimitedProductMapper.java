@@ -231,6 +231,9 @@ public class LimitedProductMapper {
 	) {
 		return GetOrderedProductInfoResponseV1.OrderedProductInfo
 			.builder()
+			.limitedProductId(product.getId())
+			.limitedProductOptionId(productOption.getId())
+			.limitedProductItemId(productItem.getId())
 			.name(product.getName())
 			.brandName(product.getBrandName())
 			.sellerId(product.getSellerId())

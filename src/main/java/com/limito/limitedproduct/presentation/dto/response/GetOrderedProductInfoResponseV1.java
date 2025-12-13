@@ -1,6 +1,7 @@
 package com.limito.limitedproduct.presentation.dto.response;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,9 @@ public class GetOrderedProductInfoResponseV1 {
 	@Getter
 	public static class OrderedProductInfo {
 
+		private UUID limitedProductId;
+		private UUID limitedProductOptionId;
+		private UUID limitedProductItemId;
 		private String name;
 		private String brandName;
 		private Long sellerId;
