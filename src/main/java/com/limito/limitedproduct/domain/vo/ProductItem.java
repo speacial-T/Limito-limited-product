@@ -2,8 +2,8 @@ package com.limito.limitedproduct.domain.vo;
 
 import java.util.UUID;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.model.ProductOption;
 
 import jakarta.persistence.Column;
@@ -79,14 +79,13 @@ public class ProductItem {
 
 	public void validateProductItemIsNotSoldOut() {
 		if (isSoldOut) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_IS_SOLD_OUT);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_IS_SOLD_OUT);
 		}
 	}
 
 	public void validatePurchaseAmountLimit(int amount) {
 		if (amount > purchaseAmountLimit) {
-			throw LimitedProductInternalException.of(
-				LimitedProductInternalErrorCode.PRODUCT_ITEM_OVER_PURCHASE_AMOUNT_LIMIT);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_OVER_PURCHASE_AMOUNT_LIMIT);
 		}
 	}
 

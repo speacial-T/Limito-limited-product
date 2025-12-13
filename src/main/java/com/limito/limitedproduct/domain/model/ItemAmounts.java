@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.vo.ItemAmount;
 
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class ItemAmounts {
 
 	public void validateDuplicateId(List<UUID> requestItemIdList) {
 		if (itemAmounts.size() != requestItemIdList.size()) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
 		}
 	}
 }

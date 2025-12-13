@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.vo.OptionItemAmount;
 
 import lombok.Builder;
@@ -20,7 +20,7 @@ public class OptionItemAmounts {
 
 	public void validateDuplicateId(List<UUID> idList) {
 		if (optionItemAmounts.size() != idList.size()) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_DUPLICATE_UUID);
 		}
 	}
 
@@ -34,7 +34,7 @@ public class OptionItemAmounts {
 
 	public void validateOptionId(List<ProductOption> productOptionList) {
 		if (getOptionIdSet().size() != productOptionList.size()) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_WRONG_UUID);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_WRONG_UUID);
 		}
 	}
 }

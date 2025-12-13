@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import com.limito.common.exception.AppException;
 import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 
@@ -27,16 +25,16 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
 	}
 
 	public void soldOut(UUID productOptionId, UUID productItemId) {
-		ProductOption productOption = productOptionJpaRepository.findById(productOptionId).orElseThrow(() ->
-			LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_WRONG_UUID));
+		ProductOption productOption = productOptionJpaRepository.findById(productOptionId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_WRONG_UUID));
 
 		productOption.makeItemSoldOut(productItemId);
 	}
 
 	@Override
 	public ProductOption findByIdOrElseThrow(UUID limitedProductOptionId) {
-		return productOptionJpaRepository.findById(limitedProductOptionId).orElseThrow(() ->
-			AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_WRONG_UUID));
+		return productOptionJpaRepository.findById(limitedProductOptionId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_WRONG_UUID));
 	}
 
 	@Override

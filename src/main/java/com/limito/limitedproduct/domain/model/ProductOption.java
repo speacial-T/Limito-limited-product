@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.limito.limitedproduct.application.exception.LimitedProductInternalErrorCode;
-import com.limito.limitedproduct.application.exception.LimitedProductInternalException;
+import com.limito.common.exception.AppException;
+import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.vo.OptionStatus;
 import com.limito.limitedproduct.domain.vo.ProductItem;
 
@@ -86,7 +86,7 @@ public class ProductOption {
 
 	public void validateProductOptionOpened() {
 		if (status != OptionStatus.OPEN) {
-			throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_OPTION_NOT_OPENED);
+			throw AppException.of(LimitedProductErrorCode.PRODUCT_OPTION_NOT_OPENED);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class ProductOption {
 				return;
 			}
 		}
-		throw LimitedProductInternalException.of(LimitedProductInternalErrorCode.PRODUCT_ITEM_WRONG_UUID);
+		throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID);
 	}
 
 	private void checkAllSoldOut() {
