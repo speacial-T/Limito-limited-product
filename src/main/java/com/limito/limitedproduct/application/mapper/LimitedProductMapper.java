@@ -239,6 +239,7 @@ public class LimitedProductMapper {
 			.sellerId(product.getSellerId())
 			.color(productOption.getColor())
 			.size(productItem.getSize())
+			.price(productItem.getPrice())
 			.build();
 	}
 }
