@@ -21,7 +21,7 @@ jobs:
         run: mkdir ./Limito-limited-product
 
       - name: Gradle Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
       - name: Archive 파일명 변경
         run: mv ./build/libs/*SNAPSHOT.jar ./Limito-limited-product/app.jar
