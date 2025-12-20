@@ -43,6 +43,7 @@ import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetInCartProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetOrderedProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
@@ -95,7 +96,7 @@ public class LimitedProductServiceV1 {
 
 	public GetProductOptionResponseV1 getProductOption(UUID limitedProductOptionId) {
 		ProductOption productOption = productOptionRepository.findByIdOrElseThrow(limitedProductOptionId);
-		Product product = productRepository.findByIdOrElseThrow(productOption.getProductId());
+		Product product = productRepository.findByIdOrElseThrowAppException(productOption.getProductId());
 
 		return LimitedProductMapper.toGetProductOptionResponse(product, productOption);
 	}
@@ -252,7 +253,8 @@ public class LimitedProductServiceV1 {
 			for (ProductItem productItem : productOption.getItemList()) {
 				for (UUID itemId : itemIdList) {
 					if (productItem.getId().equals(itemId)) {
-						Product product = productRepository.findById(productOption.getProductId());
+						Product product = productRepository.findByIdOrElseThrowAppException(
+							productOption.getProductId());
 						orderedProductInfoList.add(
 							LimitedProductMapper.toOrderedProductInfo(product, productOption, productItem)
 						);
@@ -292,5 +294,17 @@ public class LimitedProductServiceV1 {
 			ProductItem productItem = productItemList.get(itemAmountRequest.limitedProductItemId());
 			productItem.validatePurchaseAmountLimit(itemAmountRequest.amount());
 		}
+	}
+
+	public GetInCartProductInfoResponseV1 getInCartProductInfo(UUID limitedProductItemId) {
+		ProductItem productItem = productItemRepository.findByIdOrElseThrowAppException(limitedProductItemId);
+		Product product
+			= productRepository.findByIdOrElseThrowAppException(productItem.getProductOption().getProductId());
+
+		return LimitedProductMapper.toGetInCartProductInfoResponseV1(
+			product,
+			productItem.getProductOption(),
+			productItem
+		);
 	}
 }

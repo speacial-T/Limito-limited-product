@@ -8,4 +8,6 @@ import com.limito.limitedproduct.domain.vo.ProductItem;
 public interface ProductItemRepository {
 
 	List<ProductItem> findAllById(List<UUID> uuids);
+
+	ProductItem findByIdOrElseThrowAppException(UUID itemId);
 }
