@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,7 @@ import com.limito.limitedproduct.domain.model.ItemAmounts;
 import com.limito.limitedproduct.domain.model.OptionItemAmounts;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductAndOption;
+import com.limito.limitedproduct.domain.model.ProductItems;
 import com.limito.limitedproduct.domain.model.ProductOption;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
 import com.limito.limitedproduct.domain.repository.ProductItemRepository;
@@ -34,11 +34,9 @@ import com.limito.limitedproduct.domain.vo.ProductItem;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
-import com.limito.limitedproduct.presentation.dto.request.GetOrderedProductInfoRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
-import com.limito.limitedproduct.presentation.dto.request.ProductOptionItemRequest;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
@@ -116,8 +114,8 @@ public class LimitedProductServiceV1 {
 
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(
 		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1) {
-		List<ProductItem> productItemList = productItemRepository.findAllById(
-			getPurchaseAmountLimitRequestV1.itemIdList().stream().toList());
+		List<ProductItem> productItemList = productItemRepository.findAllByIdSet(
+			getPurchaseAmountLimitRequestV1.itemIdList());
 
 		return LimitedProductMapper.toGetPurchaseAmountLimitResponse(productItemList);
 	}
@@ -130,7 +128,7 @@ public class LimitedProductServiceV1 {
 
 		validateDuplicateId(requestItemIdList);
 
-		List<ProductItem> productItemList = productItemRepository.findAllById(requestItemIdList);
+		List<ProductItem> productItemList = productItemRepository.findAllByIdSet(new HashSet<>(requestItemIdList));
 
 		validateOpened(productItemList);
 		validateIsNotSoldOut(productItemList);
@@ -230,35 +228,15 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	public GetOrderedProductInfoResponseV1 getOrderedProductInfo(GetOrderedProductInfoRequestV1 request) {
-		List<UUID> itemIdList = request.products()
-			.stream()
-			.map(ProductOptionItemRequest::limitedProductItemId)
-			.toList();
-		Set<UUID> itemIdSet = new HashSet<>(itemIdList);
-		if (itemIdSet.size() != itemIdList.size()) {
-			throw AppException.of(HttpStatus.BAD_REQUEST, "중복 아이템 id입니다.");
-		}
-
-		// TODO: 추후 aggregate root를 Product로 바꾸면서 로직 변경 예정
-		List<UUID> optionIdList = request.products()
-			.stream()
-			.map(ProductOptionItemRequest::limitedProductOptionId)
-			.toList();
-		List<ProductOption> productOptionList = productOptionRepository.findAllByIds(new HashSet<>(optionIdList));
+	public GetOrderedProductInfoResponseV1 getOrderedProductInfo(Set<UUID> productItemIdSet) {
+		ProductItems productItemList = ProductItems.of(productItemRepository.findAllByIdSet(productItemIdSet));
 
 		List<GetOrderedProductInfoResponseV1.OrderedProductInfo> orderedProductInfoList = new ArrayList<>();
-		for (ProductOption productOption : productOptionList) {
-			for (ProductItem productItem : productOption.getItemList()) {
-				for (UUID itemId : itemIdList) {
-					if (productItem.getId().equals(itemId)) {
-						Product product = productRepository.findById(productOption.getProductId());
-						orderedProductInfoList.add(
-							LimitedProductMapper.toOrderedProductInfo(product, productOption, productItem)
-						);
-					}
-				}
-			}
+		for (ProductItem productItem : productItemList.getProductItemList()) {
+			Product product = productRepository.findById(productItem.getProductOption().getProductId());
+			orderedProductInfoList.add(
+				LimitedProductMapper.toOrderedProductInfo(product, productItem.getProductOption(), productItem)
+			);
 		}
 
 		return LimitedProductMapper.toGetOrderedProductInfoResponse(orderedProductInfoList);

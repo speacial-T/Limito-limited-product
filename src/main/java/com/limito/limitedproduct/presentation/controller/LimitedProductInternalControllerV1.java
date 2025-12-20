@@ -1,15 +1,18 @@
 package com.limito.limitedproduct.presentation.controller;
 
+import java.util.Set;
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.limito.limitedproduct.application.service.LimitedProductServiceV1;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
-import com.limito.limitedproduct.presentation.dto.request.GetOrderedProductInfoRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.GetPurchaseAmountLimitRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReduceStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.ReserveStockRequestV1;
@@ -66,9 +69,9 @@ public class LimitedProductInternalControllerV1 {
 
 	@GetMapping("/ordered-products")
 	public ResponseEntity<GetOrderedProductInfoResponseV1> getOrderedProductInfo(
-		@Valid @RequestBody GetOrderedProductInfoRequestV1 request
+		@Valid @RequestParam Set<UUID> productItemIdSet
 	) {
-		GetOrderedProductInfoResponseV1 response = limitedProductServiceV1.getOrderedProductInfo(request);
+		GetOrderedProductInfoResponseV1 response = limitedProductServiceV1.getOrderedProductInfo(productItemIdSet);
 
 		return ResponseEntity.ok(response);
 	}
