@@ -8,12 +8,12 @@ import lombok.Getter;
 public class GetInCartProductInfoResponseV1 {
 
 	private String productName;
+	private Long sellerId;
+	private String brandName;
 	private String productColor;
+	private String thumbnailUrl;
+	private String productStatus;
 	private String productSize;
 	private int productPrice;
-	private String brandName;
-	private String thumbnailUrl;
-	private Long sellerId;
-	private String productStatus;
 	private Boolean isSoldOut;
 }

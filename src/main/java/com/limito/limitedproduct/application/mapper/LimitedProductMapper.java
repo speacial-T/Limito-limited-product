@@ -250,15 +250,15 @@ public class LimitedProductMapper {
 		ProductItem productItem
 	) {
 		return GetInCartProductInfoResponseV1.builder()
-			.name(product.getName())
-			.brandName(product.getBrandName())
+			.productName(product.getName())
 			.sellerId(product.getSellerId())
-			.color(productOption.getColor())
-			.size(productItem.getSize())
-			.price(productItem.getPrice())
+			.brandName(product.getBrandName())
+			.productColor(productOption.getColor())
 			.thumbnailUrl(productOption.getThumbnailUrl())
 			.productStatus(productOption.getStatus().name())
-			.isSoldOut(productOption.isSoldOut())
+			.productSize(productItem.getSize())
+			.productPrice(productItem.getPrice())
+			.isSoldOut(productItem.isSoldOut())
 			.build();
 	}
 }
