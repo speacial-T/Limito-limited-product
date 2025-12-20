@@ -29,13 +29,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 	}
 
 	@Override
-	public Product findByIdOrElseThrow(UUID productId) {
-		return productJpaRepository.findById(productId)
-			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_UUID));
-	}
-
-	@Override
-	public Product findById(UUID productId) {
+	public Product findByIdOrElseThrowAppException(UUID productId) {
 		return productJpaRepository.findById(productId)
 			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_UUID));
 	}
