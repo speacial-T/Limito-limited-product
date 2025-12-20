@@ -3,6 +3,7 @@ package com.limito.limitedproduct.domain.model;
 import java.util.UUID;
 
 import com.limito.common.exception.AppException;
+import com.limito.common.security.audit.BaseEntity;
 import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 
 import jakarta.persistence.Column;
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Product {
+public class Product extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -42,11 +43,11 @@ public class Product {
 	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 
+	@Column(name = "product_code", nullable = false, updatable = false)
+	private String productCode;
+
 	@Column(name = "seller_id", nullable = false, updatable = false)
 	private Long sellerId;
-
-	@Column(name = "brand_name", nullable = false, length = 100)
-	private String brandName;
 
 	@Builder
 	private Product(
@@ -59,18 +60,11 @@ public class Product {
 		this.categoryId = categoryId;
 		this.name = name;
 		this.sellerId = sellerId;
-		this.brandName = brandName;
 	}
 
 	public void validateCategoryId(UUID categoryId) {
 		if (!this.categoryId.equals(categoryId)) {
 			throw AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_CATEGORY_ID);
-		}
-	}
-
-	public void validateBrandName(String brandName) {
-		if (!this.brandName.equals(brandName)) {
-			throw AppException.of(LimitedProductErrorCode.PRODUCT_WRONG_BRAND_NAME);
 		}
 	}
 }

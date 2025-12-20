@@ -5,19 +5,21 @@ import java.util.List;
 import java.util.UUID;
 
 import com.limito.common.exception.AppException;
+import com.limito.common.security.audit.BaseEntity;
 import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.domain.vo.OptionStatus;
-import com.limito.limitedproduct.domain.vo.ProductItem;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,27 +27,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "p_limited_product_options")
+@Table(name = "p_limited_models")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ProductOption {
+public class Model extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "limited_product_option_id", nullable = false, updatable = false)
+	@Column(name = "limited_model_id", nullable = false, updatable = false)
 	private UUID id;
-
-	@Column(name = "model_number", nullable = false, unique = true, length = 50)
-	private String modelNumber;
 
 	@Column(name = "thumbnail_url", nullable = false)
 	private String thumbnailUrl;
 
 	@Column(name = "details", columnDefinition = "TEXT")
 	private String details;
-
-	@Column(name = "color", nullable = false, length = 50)
-	private String color = "one color";
 
 	@Column(name = "open_at", nullable = false, updatable = false)
 	private LocalDateTime openAt;
@@ -54,34 +50,32 @@ public class ProductOption {
 	@Enumerated(EnumType.STRING)
 	private OptionStatus status = OptionStatus.READY;
 
-	@Column(name = "sold_out", nullable = false)
-	private boolean isSoldOut = false;
-
 	@Column(name = "minimum_price", nullable = false)
 	private int minimumPrice;
 
-	@Column(name = "limited_product_id", nullable = false, updatable = false)
-	private UUID productId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "product_id", nullable = false, updatable = false)
+	private Product product;
 
-	@OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductItem> itemList;
+	@OneToOne
+	@JoinColumn(name = "display_option_group_id", unique = true, nullable = false, updatable = false)
+	private OptionGroup displayOptionGroup;
 
 	@Builder
-	private ProductOption(
-		String modelNumber,
+	private Model(
 		String thumbnailUrl,
 		String details,
 		LocalDateTime openAt,
 		String color
 	) {
-		this.modelNumber = modelNumber;
+		// this.modelNumber = modelNumber;
 		this.thumbnailUrl = thumbnailUrl;
 		this.details = details;
 		this.openAt = openAt;
 
-		if (color != null) {
-			this.color = color;
-		}
+		// if (color != null) {
+		// 	this.color = color;
+		// }
 	}
 
 	public void validateProductOptionOpened() {
@@ -96,14 +90,14 @@ public class ProductOption {
 		}
 	}
 
-	public void attachProduct(UUID productId) {
-		this.productId = productId;
+	public void attachProduct(Product product) {
+		this.product = product;
 	}
 
-	public void attachProductItems(List<ProductItem> productItemList) {
-		itemList = productItemList;
-		for (ProductItem productItem : productItemList) {
-			productItem.attachProductOption(this);
+	public void attachProductItems(List<Sku> skuList) {
+		// itemList = skuList;
+		for (Sku sku : skuList) {
+			sku.attachProductOption(this);
 		}
 		checkAllSoldOut();
 		updateMinimumPrice();
@@ -112,32 +106,33 @@ public class ProductOption {
 	public void makeItemSoldOut(UUID productItemId) {
 		//TODO: refactor - for-if
 		// TODO: refactor - for-if
-		for (ProductItem productItem : itemList) {
-			if (productItem.getId().equals(productItemId)) {
-				productItem.soldOut();
-				checkAllSoldOut();
-				return;
-			}
-		}
+		// for (Sku sku : itemList) {
+		// 	if (sku.getId().equals(productItemId)) {
+		// 		sku.soldOut();
+		// 		checkAllSoldOut();
+		// 		return;
+		// 	}
+		// }
 		throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID);
 	}
 
 	private void checkAllSoldOut() {
 		//TODO: refactor - for-if
-		for (ProductItem productItem : itemList) {
-			if (!productItem.isSoldOut()) {
-				this.isSoldOut = false;
-				return;
-			}
-			this.isSoldOut = true;
-		}
+
+		// for (Sku sku : itemList) {
+		// 	if (!sku.isSoldOut()) {
+		// 		this.isSoldOut = false;
+		// 		return;
+		// 	}
+		// 	this.isSoldOut = true;
+		// }
 	}
 
 	private void updateMinimumPrice() {
 		int min = Integer.MAX_VALUE;
-		for (ProductItem productItem : itemList) {
-			min = Integer.min(min, productItem.getPrice());
-		}
+		// for (Sku sku : itemList) {
+		// 	min = Integer.min(min, sku.getPrice());
+		// }
 		this.minimumPrice = min;
 	}
 
@@ -149,17 +144,18 @@ public class ProductOption {
 
 	private void rollbackStock(UUID itemId, int amount) {
 		// TODO: refactor - for-if
-		for (ProductItem productItem : itemList) {
-			if (productItem.getId().equals(itemId)) {
-				productItem.rollbackStock(amount);
-				changeIsSoldOutToFalse();
-			}
-		}
+
+		// for (Sku sku : itemList) {
+		// 	if (sku.getId().equals(itemId)) {
+		// 		sku.rollbackStock(amount);
+		// 		changeIsSoldOutToFalse();
+		// 	}
+		// }
 	}
 
 	private void changeIsSoldOutToFalse() {
-		if (isSoldOut) {
-			isSoldOut = false;
-		}
+		// if (isSoldOut) {
+		// 	isSoldOut = false;
+		// }
 	}
 }
