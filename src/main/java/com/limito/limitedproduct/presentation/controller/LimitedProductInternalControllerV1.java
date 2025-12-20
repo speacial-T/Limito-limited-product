@@ -80,7 +80,7 @@ public class LimitedProductInternalControllerV1 {
 
 	@GetMapping("/in-cart-product/{limitedProductItemId}")
 	public ResponseEntity<GetInCartProductInfoResponseV1> getInCartProductInfo(
-		@NotNull(message = "상품 목록은 null일 수 없습니다.")
+		@NotNull(message = "아이템 id는 null일 수 없습니다.")
 		@PathVariable UUID limitedProductItemId
 	) {
 		GetInCartProductInfoResponseV1 response = limitedProductServiceV1.getInCartProductInfo(limitedProductItemId);
