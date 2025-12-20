@@ -1,0 +1,3 @@
+# GET - 카테고리 목록 조회(성공)
+@categoryId = aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1
+GET http://localhost:19094/api/v1/limited-products/all?categoryId={{categoryId}}&page=0&size=20

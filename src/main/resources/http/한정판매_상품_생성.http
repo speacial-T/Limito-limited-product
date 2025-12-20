@@ -1,0 +1,24 @@
+# POST CREATE - 한정판매 상품 생성(성공)
+POST http://localhost:19094/api/v1/limited-products
+Content-Type: application/json
+
+{
+  "product": {
+    "categoryId": "0abe4679-b3f1-4b31-b868-7b78e0225817",
+    "name": "암튼 짱 멋진 후드티",
+    "brandName": "스투시",
+    "modelNumber": "AZZMH-B",
+    "thumbnailUrl": "url",
+    "details": null,
+    "openAt": "2021-01-01T10:30:00",
+    "color": "Black"
+  },
+  "productItems": [
+    {
+      "size": null,
+      "price": 35000,
+      "purchaseAmountLimit": null,
+      "stock": null
+    }
+  ]
+}
