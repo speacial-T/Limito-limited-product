@@ -7,13 +7,13 @@ import lombok.Getter;
 @Getter
 public class GetInCartProductInfoResponseV1 {
 
-	private String name;
+	private String productName;
+	private String productColor;
+	private String productSize;
+	private int productPrice;
 	private String brandName;
-	private Long sellerId;
-	private String color;
-	private String size;
-	private int price;
 	private String thumbnailUrl;
+	private Long sellerId;
 	private String productStatus;
 	private Boolean isSoldOut;
 }
