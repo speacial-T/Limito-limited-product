@@ -18,14 +18,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 	private final ProductJpaRepository productJpaRepository;
 
 	@Override
-	public Product findByNameAndSellerIdOrElseGetNull(String name, Long sellerId) {
-		return productJpaRepository.findByNameAndSellerId(name, sellerId)
-			.orElse(null);
-	}
-
-	@Override
-	public Product save(Product newProduct) {
-		return productJpaRepository.save(newProduct);
+	public Product findByNameAndSellerIdOrElseNull(Product product) {
+		return productJpaRepository.findByNameAndSellerId(product.getName(), product.getSellerId())
+			.orElse(product);
 	}
 
 	@Override

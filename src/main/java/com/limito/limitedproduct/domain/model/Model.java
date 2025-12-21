@@ -50,9 +50,6 @@ public class Model extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private OptionStatus status = OptionStatus.READY;
 
-	@Column(name = "minimum_price", nullable = false)
-	private int minimumPrice;
-
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "product_id", nullable = false, updatable = false)
 	private Product product;
@@ -66,16 +63,14 @@ public class Model extends BaseEntity {
 		String thumbnailUrl,
 		String details,
 		LocalDateTime openAt,
-		String color
+		Product product,
+		OptionGroup displayOptionGroup
 	) {
-		// this.modelNumber = modelNumber;
 		this.thumbnailUrl = thumbnailUrl;
 		this.details = details;
 		this.openAt = openAt;
-
-		// if (color != null) {
-		// 	this.color = color;
-		// }
+		this.product = product;
+		this.displayOptionGroup = displayOptionGroup;
 	}
 
 	public void validateProductOptionOpened() {
@@ -133,7 +128,6 @@ public class Model extends BaseEntity {
 		// for (Sku sku : itemList) {
 		// 	min = Integer.min(min, sku.getPrice());
 		// }
-		this.minimumPrice = min;
 	}
 
 	public void rollbackStockIfMatches(UUID optionId, UUID itemId, int amount) {

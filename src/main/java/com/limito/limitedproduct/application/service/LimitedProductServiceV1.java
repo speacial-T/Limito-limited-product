@@ -20,17 +20,21 @@ import com.limito.common.exception.AppException;
 import com.limito.limitedproduct.application.exception.LimitedProductErrorCode;
 import com.limito.limitedproduct.application.mapper.LimitedProductMapper;
 import com.limito.limitedproduct.domain.model.ItemAmounts;
+import com.limito.limitedproduct.domain.model.Model;
+import com.limito.limitedproduct.domain.model.Option;
+import com.limito.limitedproduct.domain.model.OptionGroup;
 import com.limito.limitedproduct.domain.model.OptionItemAmounts;
+import com.limito.limitedproduct.domain.model.OptionValue;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductAndOption;
-import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.model.Sku;
 import com.limito.limitedproduct.domain.repository.ProductCacheRepository;
-import com.limito.limitedproduct.domain.repository.ProductItemRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionQueryRepository;
 import com.limito.limitedproduct.domain.repository.ProductOptionRepository;
 import com.limito.limitedproduct.domain.repository.ProductRepository;
+import com.limito.limitedproduct.domain.repository.SkuRepository;
 import com.limito.limitedproduct.domain.vo.OptionItemAmount;
-import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.domain.vo.OptionType;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductRequestInfo;
@@ -57,7 +61,7 @@ public class LimitedProductServiceV1 {
 
 	private final ProductRepository productRepository;
 	private final ProductOptionRepository productOptionRepository;
-	private final ProductItemRepository productItemRepository;
+	private final SkuRepository skuRepository;
 
 	private final ProductCacheRepository productCacheRepository;
 
@@ -66,38 +70,34 @@ public class LimitedProductServiceV1 {
 	@Transactional
 	public CreateProductResponseV1 createProduct(Long userId, CreateProductRequestV1 request) {
 		ProductRequestInfo productRequestInfo = request.product();
-		ProductOption newProductOption = LimitedProductMapper.toProductOption(productRequestInfo);
 
-		Product product = productRepository.findByNameAndSellerIdOrElseGetNull(productRequestInfo.name(), userId);
+		Product product = LimitedProductMapper.toProduct(userId, productRequestInfo);
+		Product newProduct = productRepository.findByNameAndSellerIdOrElseNull(product);
+		Option newDisplayOption = LimitedProductMapper.toOption("color", OptionType.DISPLAY);
+		OptionValue newDisplayOptionValue
+			= LimitedProductMapper.toOptionValue(newDisplayOption, productRequestInfo.color());
+		OptionGroup newDisplayOptionGroup = LimitedProductMapper.toOptionGroup(List.of(newDisplayOptionValue));
+		Model newModel = LimitedProductMapper.toModel(productRequestInfo, newProduct, newDisplayOptionGroup);
+		Option newSellingOption = LimitedProductMapper.toOption("size", OptionType.SELLING);
 
-		// TODO: refactor - if/else
-		if (product != null) {
-			product.validateCategoryId(productRequestInfo.categoryId());
-			product.validateBrandName(productRequestInfo.brandName());
-		} else {
-			Product newProduct = LimitedProductMapper.toProduct(userId, productRequestInfo);
-			product = productRepository.save(newProduct);
+		List<Sku> skuList = new ArrayList<>();
+		for (CreateProductRequestV1.ProductItemRequestInfo productItemRequestInfo : productRequestInfo.productItems()) {
+			OptionValue newSellingOptionValue
+				= LimitedProductMapper.toOptionValue(newSellingOption, productRequestInfo.color());
+			OptionGroup newSellingOptionGroup = LimitedProductMapper.toOptionGroup(List.of(newSellingOptionValue));
+			Sku newSku = LimitedProductMapper.toSku(productItemRequestInfo, newModel, newSellingOptionGroup);
+			skuList.add(newSku);
 		}
 
-		newProductOption.attachProduct(product.getId());
+		List<Sku> savedSkuList = skuRepository.saveAll(skuList);
 
-		List<ProductItem> newProductItemList = request.productItems()
-			.stream()
-			.map(LimitedProductMapper::toProductItem)
-			.toList();
-		newProductOption.attachProductItems(newProductItemList);
-
-		ProductOption savedProductOption = productOptionRepository.save(newProductOption);
-		savedProductOption.initStatus();
-
-		return LimitedProductMapper.toCreateProductResponse(product, savedProductOption);
+		return LimitedProductMapper.toCreateProductResponse(savedSkuList);
 	}
 
 	public GetProductOptionResponseV1 getProductOption(UUID limitedProductOptionId) {
-		ProductOption productOption = productOptionRepository.findByIdOrElseThrow(limitedProductOptionId);
-		Product product = productRepository.findByIdOrElseThrow(productOption.getProductId());
+		Model model = productOptionRepository.findByIdOrElseThrow(limitedProductOptionId);
 
-		return LimitedProductMapper.toGetProductOptionResponse(product, productOption);
+		return LimitedProductMapper.toGetProductOptionResponse(model.getProduct(), model);
 	}
 
 	public GetProductsByCategoryResponseV1 getProductsByCategory(UUID categoryId, Pageable pageable) {
@@ -116,10 +116,10 @@ public class LimitedProductServiceV1 {
 
 	public GetPurchaseAmountLimitResponseV1 getPurchaseAmountLimits(
 		GetPurchaseAmountLimitRequestV1 getPurchaseAmountLimitRequestV1) {
-		List<ProductItem> productItemList = productItemRepository.findAllById(
+		List<Sku> skuList = skuRepository.findAllById(
 			getPurchaseAmountLimitRequestV1.itemIdList().stream().toList());
 
-		return LimitedProductMapper.toGetPurchaseAmountLimitResponse(productItemList);
+		return LimitedProductMapper.toGetPurchaseAmountLimitResponse(skuList);
 	}
 
 	public void reserveStock(ReserveStockRequestV1 request) {
@@ -130,13 +130,13 @@ public class LimitedProductServiceV1 {
 
 		validateDuplicateId(requestItemIdList);
 
-		List<ProductItem> productItemList = productItemRepository.findAllById(requestItemIdList);
+		List<Sku> skuList = skuRepository.findAllById(requestItemIdList);
 
-		validateOpened(productItemList);
-		validateIsNotSoldOut(productItemList);
+		validateOpened(skuList);
+		validateIsNotSoldOut(skuList);
 
-		Map<UUID, ProductItem> productItemMap = productItemList.stream()
-			.collect(Collectors.toMap(ProductItem::getId, Function.identity()));
+		Map<UUID, Sku> productItemMap = skuList.stream()
+			.collect(Collectors.toMap(Sku::getId, Function.identity()));
 		validatePurchaseAmountLimit(productItemMap, itemAmountRequestList);
 
 		List<ItemAmountRequest> reservedItemList = new ArrayList<>();
@@ -212,15 +212,15 @@ public class LimitedProductServiceV1 {
 				.toList()
 		);
 
-		List<ProductOption> productOptionList
+		List<Model> modelList
 			= productOptionRepository.findAllByIds(optionItemAmounts.getOptionIdSet());
-		optionItemAmounts.validateOptionId(productOptionList);
+		optionItemAmounts.validateOptionId(modelList);
 
 		// TODO: refactor - for-if-for(삼중ㅠㅠ)
 		for (OptionItemAmount optionItemAmount : optionItemAmounts.getOptionItemAmounts()) {
 			if (productCacheRepository.rollbackStock(optionItemAmount.getItemId(), optionItemAmount.getAmount())) {
-				for (ProductOption productOption : productOptionList) {
-					productOption.rollbackStockIfMatches(
+				for (Model model : modelList) {
+					model.rollbackStockIfMatches(
 						optionItemAmount.getOptionId(),
 						optionItemAmount.getItemId(),
 						optionItemAmount.getAmount()
@@ -245,20 +245,20 @@ public class LimitedProductServiceV1 {
 			.stream()
 			.map(ProductOptionItemRequest::limitedProductOptionId)
 			.toList();
-		List<ProductOption> productOptionList = productOptionRepository.findAllByIds(new HashSet<>(optionIdList));
+		List<Model> modelList = productOptionRepository.findAllByIds(new HashSet<>(optionIdList));
 
 		List<GetOrderedProductInfoResponseV1.OrderedProductInfo> orderedProductInfoList = new ArrayList<>();
-		for (ProductOption productOption : productOptionList) {
-			for (ProductItem productItem : productOption.getItemList()) {
-				for (UUID itemId : itemIdList) {
-					if (productItem.getId().equals(itemId)) {
-						Product product = productRepository.findById(productOption.getProductId());
-						orderedProductInfoList.add(
-							LimitedProductMapper.toOrderedProductInfo(product, productOption, productItem)
-						);
-					}
-				}
-			}
+		for (Model model : modelList) {
+			// for (Sku sku : model.getItemList()) {
+			// 	for (UUID itemId : itemIdList) {
+			// 		if (sku.getId().equals(itemId)) {
+			// 			Product product = productRepository.findById(model.getProductId());
+			// 			orderedProductInfoList.add(
+			// 				LimitedProductMapper.toOrderedProductInfo(product, model, sku)
+			// 			);
+			// 		}
+			// 	}
+			// }
 		}
 
 		return LimitedProductMapper.toGetOrderedProductInfoResponse(orderedProductInfoList);
@@ -272,25 +272,25 @@ public class LimitedProductServiceV1 {
 		}
 	}
 
-	private void validateOpened(List<ProductItem> productItemList) {
-		for (ProductItem productItem : productItemList) {
-			productItem.validateProductOptionOpened();
+	private void validateOpened(List<Sku> skuList) {
+		for (Sku sku : skuList) {
+			sku.validateProductOptionOpened();
 		}
 	}
 
-	private void validateIsNotSoldOut(List<ProductItem> productItemList) {
-		for (ProductItem productItem : productItemList) {
-			productItem.validateProductItemIsNotSoldOut();
+	private void validateIsNotSoldOut(List<Sku> skuList) {
+		for (Sku sku : skuList) {
+			sku.validateProductItemIsNotSoldOut();
 		}
 	}
 
 	private void validatePurchaseAmountLimit(
-		Map<UUID, ProductItem> productItemList,
+		Map<UUID, Sku> productItemList,
 		List<ItemAmountRequest> itemAmountList
 	) {
 		for (ItemAmountRequest itemAmountRequest : itemAmountList) {
-			ProductItem productItem = productItemList.get(itemAmountRequest.limitedProductItemId());
-			productItem.validatePurchaseAmountLimit(itemAmountRequest.amount());
+			Sku sku = productItemList.get(itemAmountRequest.limitedProductItemId());
+			sku.validatePurchaseAmountLimit(itemAmountRequest.amount());
 		}
 	}
 }

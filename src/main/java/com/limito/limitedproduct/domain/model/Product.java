@@ -54,12 +54,13 @@ public class Product extends BaseEntity {
 		UUID categoryId,
 		String name,
 		Long sellerId,
-		String brandName
+		String productCode
 	) {
 		//TODO: 카테고리ID 검증
 		this.categoryId = categoryId;
 		this.name = name;
 		this.sellerId = sellerId;
+		this.productCode = productCode;
 	}
 
 	public void validateCategoryId(UUID categoryId) {

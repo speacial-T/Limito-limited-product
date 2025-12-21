@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,11 @@ public class OptionGroup extends BaseEntity {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OptionValue> optionValueList;
+
+	@Builder
+	private OptionGroup(
+		List<OptionValue> optionValueList
+	) {
+		this.optionValueList = optionValueList;
+	}
 }

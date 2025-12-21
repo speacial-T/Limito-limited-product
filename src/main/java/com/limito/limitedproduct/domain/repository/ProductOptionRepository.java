@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.model.Model;
 
 public interface ProductOptionRepository {
 
-	ProductOption save(ProductOption productOption);
-
 	void soldOut(UUID productOptionId, UUID productItemId);
 
-	ProductOption findByIdOrElseThrow(UUID limitedProductOptionId);
+	Model findByIdOrElseThrow(UUID limitedProductOptionId);
 
-	List<ProductOption> findAllByIds(Set<UUID> optionIdList);
+	List<Model> findAllByIds(Set<UUID> optionIdList);
 }

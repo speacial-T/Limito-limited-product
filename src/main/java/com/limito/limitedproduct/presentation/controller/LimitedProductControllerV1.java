@@ -39,16 +39,7 @@ public class LimitedProductControllerV1 {
 
 		CreateProductResponseV1 response = limitedProductServiceV1.createProduct(userId, request);
 
-		return ResponseEntity
-			.created(
-				URI.create(
-					String.format(
-						"/api/v1/limited-products/%s",
-						response.getProductOptionInfo()
-							.getLimitedProductOptionId()
-					)
-				)
-			)
+		return ResponseEntity.created(URI.create(String.format("/api/v1/limited-products/%s", response.getModelId())))
 			.body(response);
 	}
 

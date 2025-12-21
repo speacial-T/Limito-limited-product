@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +35,10 @@ public class Option extends BaseEntity {
 	@Column(name = "type", nullable = false, updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OptionType type;
+
+	@Builder
+	private Option(String name, OptionType optionType) {
+		this.name = name;
+		this.type = optionType;
+	}
 }

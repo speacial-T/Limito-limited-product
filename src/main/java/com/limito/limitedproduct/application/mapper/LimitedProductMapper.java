@@ -7,13 +7,17 @@ import java.util.UUID;
 import org.springframework.data.web.PagedModel;
 
 import com.limito.limitedproduct.domain.model.ItemAmounts;
+import com.limito.limitedproduct.domain.model.Model;
+import com.limito.limitedproduct.domain.model.Option;
+import com.limito.limitedproduct.domain.model.OptionGroup;
 import com.limito.limitedproduct.domain.model.OptionItemAmounts;
+import com.limito.limitedproduct.domain.model.OptionValue;
 import com.limito.limitedproduct.domain.model.Product;
 import com.limito.limitedproduct.domain.model.ProductAndOption;
-import com.limito.limitedproduct.domain.model.ProductOption;
+import com.limito.limitedproduct.domain.model.Sku;
 import com.limito.limitedproduct.domain.vo.ItemAmount;
 import com.limito.limitedproduct.domain.vo.OptionItemAmount;
-import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.domain.vo.OptionType;
 import com.limito.limitedproduct.global.dto.response.ProductAndOptionResponse;
 import com.limito.limitedproduct.presentation.dto.request.CancelReserveStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.request.CreateProductRequestV1.ProductItemRequestInfo;
@@ -27,37 +31,57 @@ import com.limito.limitedproduct.presentation.dto.response.GetProductOptionRespo
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetPurchaseAmountLimitResponseV1.PurchaseAmountLimit;
-import com.limito.limitedproduct.presentation.dto.response.ProductItemResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductOptionResponseInfo;
-import com.limito.limitedproduct.presentation.dto.response.ProductResponseInfo;
+import com.limito.limitedproduct.presentation.dto.response.OptionInfo;
+import com.limito.limitedproduct.presentation.dto.response.SkuInfo;
 
 public class LimitedProductMapper {
 
-	public static Product toProduct(Long sellerId, ProductRequestInfo productRequestInfo) {
+	public static Product toProduct(Long userId, ProductRequestInfo productRequestInfo) {
 		return Product.builder()
 			.categoryId(productRequestInfo.categoryId())
 			.name(productRequestInfo.name())
-			.sellerId(sellerId)
-			.brandName(productRequestInfo.brandName())
+			.productCode(productRequestInfo.productCode())
+			.sellerId(userId)
 			.build();
 	}
 
-	public static ProductOption toProductOption(ProductRequestInfo productRequestInfo) {
-		return ProductOption.builder()
-			.modelNumber(productRequestInfo.modelNumber())
+	public static Model toModel(ProductRequestInfo productRequestInfo, Product product, OptionGroup optionGroup) {
+		return Model.builder()
 			.thumbnailUrl(productRequestInfo.thumbnailUrl())
 			.details(productRequestInfo.details())
 			.openAt(productRequestInfo.openAt())
-			.color(productRequestInfo.color())
+			.product()
+			.displayOptionGroup(optionGroup)
 			.build();
 	}
 
-	public static ProductItem toProductItem(ProductItemRequestInfo productItemRequestInfo) {
-		return ProductItem.builder()
-			.size(productItemRequestInfo.size())
+	public static Sku toSku(ProductItemRequestInfo productItemRequestInfo, Model model, OptionGroup optionGroup) {
+		return Sku.builder()
 			.price(productItemRequestInfo.price())
 			.stock(productItemRequestInfo.stock())
-			.purchaseAmountLimit(productItemRequestInfo.purchaseAmountLimit())
+			.maxAmount(productItemRequestInfo.purchaseAmountLimit())
+			.model(model)
+			.sellingOptionGroup(optionGroup)
+			.build();
+	}
+
+	public static Option toOption(String name, OptionType optionType) {
+		return Option.builder()
+			.name(name)
+			.optionType(optionType)
+			.build();
+	}
+
+	public static OptionValue toOptionValue(Option option, String value) {
+		return OptionValue.builder()
+			.option(option)
+			.value(value)
+			.build();
+	}
+
+	public static OptionGroup toOptionGroup(List<OptionValue> optionValueList) {
+		return OptionGroup.builder()
+			.optionValueList(optionValueList)
 			.build();
 	}
 
@@ -98,56 +122,74 @@ public class LimitedProductMapper {
 			.build();
 	}
 
-	public static GetPurchaseAmountLimitResponseV1 toGetPurchaseAmountLimitResponse(List<ProductItem> productItemList) {
+	public static GetPurchaseAmountLimitResponseV1 toGetPurchaseAmountLimitResponse(List<Sku> skuList) {
 		return GetPurchaseAmountLimitResponseV1.builder()
-			.items(productItemList.stream()
+			.items(skuList.stream()
 				.map(LimitedProductMapper::toPurchaseAmountLimit)
 				.toList()
 			)
 			.build();
 	}
 
-	public static PurchaseAmountLimit toPurchaseAmountLimit(ProductItem productItem) {
+	public static PurchaseAmountLimit toPurchaseAmountLimit(Sku sku) {
 		return PurchaseAmountLimit.builder()
-			.limitedProductItemId(productItem.getId())
-			.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
+			.limitedProductItemId(sku.getId())
+			.purchaseAmountLimit(sku.getMaxAmount())
 			.build();
 	}
 
-	public static CreateProductResponseV1 toCreateProductResponse(Product product, ProductOption productOption) {
+	public static CreateProductResponseV1 toCreateProductResponse(List<Sku> skuList) {
+		Model model = skuList.get(0).getModel();
+		Product product = model.getProduct();
+
 		return CreateProductResponseV1.builder()
-			.productInfo(
-				ProductResponseInfo.builder()
-					.limitedProductId(product.getId())
-					.categoryId(product.getCategoryId())
-					.name(product.getName())
-					.sellerId(product.getSellerId())
-					.brandName(product.getBrandName())
-					.build()
-			)
-			.productOptionInfo(
-				ProductOptionResponseInfo.builder()
-					.limitedProductOptionId(productOption.getId())
-					.modelNumber(productOption.getModelNumber())
-					.thumbnailUrl(productOption.getThumbnailUrl())
-					.details(productOption.getDetails())
-					.color(productOption.getColor())
-					.openAt(productOption.getOpenAt())
-					.status(productOption.getStatus().name())
-					.soldOut(productOption.isSoldOut())
-					.minimumPrice(productOption.getMinimumPrice())
-					.build()
-			)
-			.productItems(
-				productOption.getItemList()
+			.modelId(model.getId())
+			.categoryId(product.getCategoryId())
+			.name(product.getName())
+			.productCode(product.getProductCode())
+			.sellerId(product.getSellerId())
+			.thumbnailUrl(model.getThumbnailUrl())
+			.details(model.getDetails())
+			.displayOptions(
+				model.getDisplayOptionGroup()
+					.getOptionValueList()
 					.stream()
-					.map(LimitedProductMapper::toProductItemResponseInfo)
+					.map(optionValue -> toOptionInfo(optionValue.getOption(), optionValue))
+					.toList()
+			)
+			.skus(
+				skuList.stream()
+					.map(LimitedProductMapper::toSkuInfo)
 					.toList()
 			)
 			.build();
 	}
 
-	public static GetProductOptionResponseV1 toGetProductOptionResponse(Product product, ProductOption productOption) {
+	public static OptionInfo toOptionInfo(Option option, OptionValue optionValue) {
+		return OptionInfo.builder()
+			.name(option.getName())
+			.value(optionValue.getValue())
+			.build();
+	}
+
+	public static SkuInfo toSkuInfo(Sku sku) {
+		return SkuInfo.builder()
+			.skuId(sku.getId())
+			.price(sku.getPrice())
+			.stock(sku.getStock())
+			.isSoldOut(sku.isSoldOut())
+			.maxAmount(sku.getMaxAmount())
+			.sellingOptions(
+				sku.getSellingOptionGroup()
+					.getOptionValueList()
+					.stream()
+					.map(optionValue -> toOptionInfo(optionValue.getOption(), optionValue))
+					.toList()
+			)
+			.build();
+	}
+
+	public static GetProductOptionResponseV1 toGetProductOptionResponse(Product product, Model model) {
 		return GetProductOptionResponseV1.builder()
 			.productInfo(
 				ProductResponseInfo.builder()
@@ -155,39 +197,39 @@ public class LimitedProductMapper {
 					.categoryId(product.getCategoryId())
 					.name(product.getName())
 					.sellerId(product.getSellerId())
-					.brandName(product.getBrandName())
+					// .brandName(product.getBrandName())
 					.build()
 			)
 			.productOptionInfo(
 				ProductOptionResponseInfo.builder()
-					.limitedProductOptionId(productOption.getId())
-					.modelNumber(productOption.getModelNumber())
-					.thumbnailUrl(productOption.getThumbnailUrl())
-					.details(productOption.getDetails())
-					.color(productOption.getColor())
-					.openAt(productOption.getOpenAt())
-					.status(productOption.getStatus().name())
-					.soldOut(productOption.isSoldOut())
-					.minimumPrice(productOption.getMinimumPrice())
+					.limitedProductOptionId(model.getId())
+					// .productCode(model.getModelNumber())
+					.thumbnailUrl(model.getThumbnailUrl())
+					.details(model.getDetails())
+					// .color(model.getColor())
+					.openAt(model.getOpenAt())
+					.status(model.getStatus().name())
+					// .soldOut(model.isSoldOut())
+					.minimumPrice(model.getMinimumPrice())
 					.build()
 			)
-			.productItems(
-				productOption.getItemList()
-					.stream()
-					.map(LimitedProductMapper::toProductItemResponseInfo)
-					.toList()
-			)
+			// .productItems(
+			// 	model.getItemList()
+			// 		.stream()
+			// 		.map(LimitedProductMapper::toProductItemResponseInfo)
+			// 		.toList()
+			// )
 			.build();
 	}
 
-	private static ProductItemResponseInfo toProductItemResponseInfo(ProductItem productItem) {
-		return ProductItemResponseInfo.builder()
-			.limitedProductItemId(productItem.getId())
-			.size(productItem.getSize())
-			.price(productItem.getPrice())
-			.purchaseAmountLimit(productItem.getPurchaseAmountLimit())
-			.stock(productItem.getStock())
-			.soldOut(productItem.isSoldOut())
+	private static SkuInfo toProductItemResponseInfo(Sku sku) {
+		return SkuInfo.builder()
+			.skuId(sku.getId())
+			// .size(sku.getSize())
+			.price(sku.getPrice())
+			.purchaseAmountLimit(sku.getMaxAmount())
+			.stock(sku.getStock())
+			.soldOut(sku.isSoldOut())
 			.build();
 	}
 
@@ -226,20 +268,20 @@ public class LimitedProductMapper {
 
 	public static GetOrderedProductInfoResponseV1.OrderedProductInfo toOrderedProductInfo(
 		Product product,
-		ProductOption productOption,
-		ProductItem productItem
+		Model model,
+		Sku sku
 	) {
 		return GetOrderedProductInfoResponseV1.OrderedProductInfo
 			.builder()
 			.limitedProductId(product.getId())
-			.limitedProductOptionId(productOption.getId())
-			.limitedProductItemId(productItem.getId())
+			.limitedProductOptionId(model.getId())
+			.limitedProductItemId(sku.getId())
 			.name(product.getName())
-			.brandName(product.getBrandName())
-			.sellerId(product.getSellerId())
-			.color(productOption.getColor())
-			.size(productItem.getSize())
-			.price(productItem.getPrice())
+			// .brandName(product.getBrandName())
+			// .sellerId(product.getSellerId())
+			// .color(model.getColor())
+			// .size(sku.getSize())
+			.price(sku.getPrice())
 			.build();
 	}
 }

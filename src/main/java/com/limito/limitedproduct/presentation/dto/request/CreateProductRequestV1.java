@@ -12,12 +12,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 public record CreateProductRequestV1(
-	@Valid CreateProductRequestV1.ProductRequestInfo product,
-
-	@NotNull(message = "아이템 목록은 null일 수 없습니다.")
-	@Size(min = 1, message = "요청값에 최소 한 개의 아이템이 있어야 합니다.")
-	@Valid List<ProductItemRequestInfo> productItems
-
+	@NotNull(message = "상품 정보는 null일 수 없습니다.")
+	@Valid ProductRequestInfo product
 ) {
 
 	public record ProductRequestInfo(
@@ -27,11 +23,8 @@ public record CreateProductRequestV1(
 		@NotBlank(message = "상품명이 없습니다.")
 		String name,
 
-		@NotBlank(message = "브랜드명이 없습니다.")
-		String brandName,
-
-		@NotBlank(message = "모델번호가 없습니다.")
-		String modelNumber,
+		@NotBlank(message = "상품 코드가 없습니다.")
+		String productCode,
 
 		@NotBlank(message = "썸네일 이미지 url이 없습니다.")
 		String thumbnailUrl,
@@ -41,11 +34,16 @@ public record CreateProductRequestV1(
 		@NotNull(message = "출시 일시는 null일 수 없습니다.")
 		LocalDateTime openAt,
 
-		String color
+		String color,
+
+		@NotNull(message = "재고 단위(sku) 목록은 null일 수 없습니다.")
+		@Size(min = 1, message = "요청값에 최소 한 개의 재고 단위(sku)가 있어야 합니다.")
+		@Valid List<ProductItemRequestInfo> productItems
 	) {
 	}
 
 	public record ProductItemRequestInfo(
+		@NotBlank(message = "크기 정보가 없습니다.")
 		String size,
 
 		@NotNull(message = "가격은 null일 수 없습니다.")

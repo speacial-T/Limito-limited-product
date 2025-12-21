@@ -54,17 +54,16 @@ public class Sku extends BaseEntity {
 
 	@Builder
 	private Sku(
-		String size,
 		int price,
 		Integer stock,
-		Integer maxAmount
+		Integer maxAmount,
+		Model model,
+		OptionGroup sellingOptionGroup
 	) {
 		this.price = price;
 		this.isSoldOut = (stock == null || stock == 0);
-
-		// if (size != null && !size.isEmpty()) {
-		// 	this.size = size;
-		// }
+		this.model = model;
+		this.sellingOptionGroup = sellingOptionGroup;
 
 		if (stock != null) {
 			this.stock = stock;

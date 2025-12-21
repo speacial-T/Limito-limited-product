@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +35,10 @@ public class OptionValue extends BaseEntity {
 
 	@Column(name = "value", nullable = false, updatable = false)
 	private String value;
+
+	@Builder
+	private OptionValue(Option option, String value) {
+		this.option = option;
+		this.value = value;
+	}
 }

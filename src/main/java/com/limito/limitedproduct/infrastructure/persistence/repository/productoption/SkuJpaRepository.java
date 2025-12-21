@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.limito.limitedproduct.domain.vo.ProductItem;
+import com.limito.limitedproduct.domain.model.Sku;
 
-public interface ProductItemJpaRepository extends JpaRepository<ProductItem, UUID> {
+public interface SkuJpaRepository extends JpaRepository<Sku, UUID> {
 }
