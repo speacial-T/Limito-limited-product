@@ -234,7 +234,8 @@ public class LimitedProductServiceV1 {
 
 		List<GetOrderedProductInfoResponseV1.OrderedProductInfo> orderedProductInfoList = new ArrayList<>();
 		for (ProductItem productItem : productItemList.getProductItemList()) {
-			Product product = productRepository.findById(productItem.getProductOption().getProductId());
+			Product product
+				= productRepository.findByIdOrElseThrowAppException(productItem.getProductOption().getProductId());
 			orderedProductInfoList.add(
 				LimitedProductMapper.toOrderedProductInfo(product, productItem.getProductOption(), productItem)
 			);
