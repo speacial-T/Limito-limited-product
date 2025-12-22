@@ -1,6 +1,7 @@
 package com.limito.limitedproduct.infrastructure.persistence.repository.productoption;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -19,15 +20,15 @@ public class ProductItemRepositoryImpl implements ProductItemRepository {
 	private final ProductItemJpaRepository productItemJpaRepository;
 
 	@Override
-	public List<ProductItem> findAllById(List<UUID> uuidList) {
-		List<ProductItem> productItemList = productItemJpaRepository.findAllById(uuidList);
+	public List<ProductItem> findAllByIdSet(Set<UUID> itemIdSet) {
+		List<ProductItem> productItemList = productItemJpaRepository.findAllById(itemIdSet);
 
-		validateFindAllById(uuidList, productItemList);
+		validateFindAllById(itemIdSet, productItemList);
 
 		return productItemList;
 	}
 
-	private void validateFindAllById(List<UUID> request, List<ProductItem> response) {
+	private void validateFindAllById(Set<UUID> request, List<ProductItem> response) {
 		if (request.size() != response.size()) {
 			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID);
 		}
