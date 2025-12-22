@@ -5,9 +5,9 @@ spring:
   application:
     name: limited-product-service
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/limito-db
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update

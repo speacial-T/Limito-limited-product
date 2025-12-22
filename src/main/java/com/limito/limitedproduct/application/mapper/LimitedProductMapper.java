@@ -22,6 +22,7 @@ import com.limito.limitedproduct.presentation.dto.request.ItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.OptionItemAmountRequest;
 import com.limito.limitedproduct.presentation.dto.request.RollbackStockRequestV1;
 import com.limito.limitedproduct.presentation.dto.response.CreateProductResponseV1;
+import com.limito.limitedproduct.presentation.dto.response.GetInCartProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetOrderedProductInfoResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductOptionResponseV1;
 import com.limito.limitedproduct.presentation.dto.response.GetProductsByCategoryResponseV1;
@@ -240,6 +241,24 @@ public class LimitedProductMapper {
 			.color(productOption.getColor())
 			.size(productItem.getSize())
 			.price(productItem.getPrice())
+			.build();
+	}
+
+	public static GetInCartProductInfoResponseV1 toGetInCartProductInfoResponseV1(
+		Product product,
+		ProductOption productOption,
+		ProductItem productItem
+	) {
+		return GetInCartProductInfoResponseV1.builder()
+			.productName(product.getName())
+			.sellerId(product.getSellerId())
+			.brandName(product.getBrandName())
+			.productColor(productOption.getColor())
+			.thumbnailUrl(productOption.getThumbnailUrl())
+			.productStatus(productOption.getStatus().name())
+			.productSize(productItem.getSize())
+			.productPrice(productItem.getPrice())
+			.isSoldOut(productItem.isSoldOut())
 			.build();
 	}
 }

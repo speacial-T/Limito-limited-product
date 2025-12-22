@@ -28,6 +28,12 @@ public class ProductItemRepositoryImpl implements ProductItemRepository {
 		return productItemList;
 	}
 
+	@Override
+	public ProductItem findByIdOrElseThrowAppException(UUID itemId) {
+		return productItemJpaRepository.findById(itemId)
+			.orElseThrow(() -> AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID));
+	}
+
 	private void validateFindAllById(Set<UUID> request, List<ProductItem> response) {
 		if (request.size() != response.size()) {
 			throw AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID);
