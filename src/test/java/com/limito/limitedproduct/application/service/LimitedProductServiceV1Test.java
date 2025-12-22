@@ -5,6 +5,8 @@ import static com.limito.limitedproduct.application.service.LimitedProductServic
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.HashSet;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ class LimitedProductServiceV1Test {
 	private LimitedProductServiceV1 limitedProductServiceV1;
 
 	private void 상품_아이디가_주어지면_준비된_상품을_반환한다() {
-		when(productItemRepository.findAllById(correctItemIdList))
+		when(productItemRepository.findAllByIdSet(new HashSet<>(correctItemIdList)))
 			.thenReturn(itemList);
 	}
 
@@ -39,11 +41,11 @@ class LimitedProductServiceV1Test {
 	private void 상품_조회_결과를_검증한다(GetPurchaseAmountLimitResponseV1 response) {
 		assertionFields(response);
 		verify(productItemRepository, times(1))
-			.findAllById(correctItemIdList);
+			.findAllByIdSet(new HashSet<>(correctItemIdList));
 	}
 
 	private void 잘못된_상품_아이디가_주어지면_에러가_발생한다() {
-		when(productItemRepository.findAllById(wrongUUIDItemIdList))
+		when(productItemRepository.findAllByIdSet(new HashSet<>(wrongUUIDItemIdList)))
 			.thenThrow(AppException.of(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID));
 	}
 
@@ -51,7 +53,7 @@ class LimitedProductServiceV1Test {
 		assertThatThrownBy(() -> limitedProductServiceV1.getPurchaseAmountLimits(wrongUUIDRequest))
 			.isInstanceOf(AppException.class)
 			.hasMessageContaining(LimitedProductErrorCode.PRODUCT_ITEM_WRONG_UUID.getMessage());
-		verify(productItemRepository, times(1)).findAllById(wrongUUIDItemIdList);
+		verify(productItemRepository, times(1)).findAllByIdSet(new HashSet<>(wrongUUIDItemIdList));
 	}
 
 	@Nested
